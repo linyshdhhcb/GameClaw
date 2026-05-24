@@ -1,0 +1,61 @@
+HELP.md
+.DS_Store
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+
+### VS Code ###
+.vscode/
+
+### Maven ###
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+### Runtime / Data ###
+mcp/*
+workspace/
+!workspace/INFO.md
+!workspace/AGENT-ORIGINAL.md
+!workspace/AGENT.md
+!workspace/openclaw.json
+!workspace/skills/skill-creator/
+*.private*
+*.h2.db
+*.lock.db
+*.trace.db
+
+### Logs ###
+*.log
+logs/
+
+### OS ###
+Thumbs.db
+Desktop.ini

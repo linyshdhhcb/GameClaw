@@ -1,5 +1,5 @@
 @org.springframework.modulith.ApplicationModule(
     displayName = "Persistence",
-    allowedDependencies = {"configuration"}
+    allowedDependencies = {"configuration", "security"}
 )
 package ai.gameclaw.persistence;

@@ -45,6 +45,8 @@
         <telegrambots.version>9.5.0</telegrambots.version>
         <commonmark.version>0.28.0</commonmark.version>
         <testcontainers.version>1.21.4</testcontainers.version>
+        <resilience4j.version>2.4.0</resilience4j.version>
+        <archunit.version>1.4.2</archunit.version>
     </properties>
 
     <dependencyManagement>
@@ -162,12 +164,16 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <release>${java.version}</release>
+                    <compilerArgs>
+                        <arg>--enable-preview</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
+                    <argLine>--enable-preview</argLine>
                     <includes>
                         <include>**/*Test.java</include>
                         <include>**/*Tests.java</include>

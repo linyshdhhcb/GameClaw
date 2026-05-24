@@ -32,7 +32,7 @@ spring:
       moderation: unknown
   threads:
     virtual:
-      enabled: false
+      enabled: true
 
 management:
   endpoint:
@@ -54,3 +54,31 @@ jobrunr:
   dashboard:
     enabled: true
     port: 8091
+
+resilience4j:
+  bulkhead:
+    instances:
+      llm-anthropic:
+        max-concurrent-calls: 100
+        max-wait-duration: 5s
+      llm-openai:
+        max-concurrent-calls: 100
+        max-wait-duration: 5s
+      llm-ollama:
+        max-concurrent-calls: 20
+        max-wait-duration: 3s
+      mcp-clickhouse:
+        max-concurrent-calls: 50
+        max-wait-duration: 5s
+  ratelimiter:
+    instances:
+      llm-anthropic:
+        limit-for-period: 50
+        limit-refresh-period: 1s
+        timeout-duration: 2s
+  circuitbreaker:
+    instances:
+      llm-default:
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 10s
+        sliding-window-size: 50

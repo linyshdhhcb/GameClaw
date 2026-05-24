@@ -1,0 +1,64 @@
+package ai.gameclaw;
+
+import ai.gameclaw.configuration.ConfigurationChangedEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
+
+@SpringBootApplication
+@org.springframework.modulith.Modulith
+public class GameClawApplication {
+
+    private static final Logger log = LoggerFactory.getLogger(GameClawApplication.class);
+    private static ConfigurableApplicationContext applicationContext;
+
+    public static void main(String[] args) {
+        applicationContext = SpringApplication.run(GameClawApplication.class, args);
+    }
+
+    @Component
+    static public class GameClawApplicationMonitor implements ApplicationRunner {
+
+
+        private final Environment environment;
+
+        public GameClawApplicationMonitor(Environment environment) {
+            this.environment = environment;
+        }
+
+        @Override
+        public void run(ApplicationArguments args) throws Exception {
+            String isConfigured = environment.getProperty("agent.onboarding.completed");
+            if (Boolean.parseBoolean(isConfigured)) {
+                log.info("GameClaw is running and waiting for your commands!");
+            } else {
+                log.info("GameClaw is waiting to be configured! Navigate to http://localhost:{}/onboarding to start the onboarding wizard", environment.getProperty("local.server.port"));
+            }
+        }
+
+        @EventListener
+        public void on(ConfigurationChangedEvent configurationChangedEvent) {
+            ApplicationArguments args = applicationContext.getBean(ApplicationArguments.class);
+            
+            Thread thread = new Thread(() -> {
+                try {
+                    Thread.sleep(2000);
+                    applicationContext.close();
+                    applicationContext = SpringApplication.run(GameClawApplication.class, args.getSourceArgs());
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            });
+
+            thread.setDaemon(false);
+            thread.start();
+        }
+    }
+}

@@ -1,0 +1,49 @@
+server:
+  port: 8090
+
+gameclaw:
+  llm:
+    adapter: spring-ai
+  workspace: file:./workspace/
+  multi-tenancy:
+    enabled: false
+
+spring:
+  application:
+    name: gameclaw
+  config:
+    import: optional:classpath:application.private.yaml
+  datasource:
+    url: jdbc:h2:file:./workspace/app
+  ai:
+    model:
+      chat: unknown
+      audio.speech: unknown
+      audio.transcription: unknown
+      embedding: unknown
+      image: unknown
+      moderation: unknown
+  threads:
+    virtual:
+      enabled: false
+
+management:
+  endpoint:
+    restart:
+      enabled: true
+
+pebble:
+  suffix: .html.peb
+
+agent:
+  onboarding:
+    completed: false
+  workspace: file:./workspace/
+
+jobrunr:
+  background-job-server:
+    enabled: true
+    worker-count: 1
+  dashboard:
+    enabled: true
+    port: 8091

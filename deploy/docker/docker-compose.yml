@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16
+    container_name: gameclaw-pg16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: gameclaw
+      POSTGRES_USER: linyi
+      POSTGRES_PASSWORD: lpy.3826
+    command:
+      - postgres
+      - -c
+      - shared_preload_libraries=uuid-ossp,pg_stat_statements
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U linyi -d gameclaw"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

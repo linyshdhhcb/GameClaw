@@ -28,6 +28,7 @@
         <module>plugins/discord</module>
         <module>plugins/playwright</module>
         <module>plugins/telegram</module>
+        <module>plugins/feishu</module>
         <module>mcp-servers/java</module>
         <module>app</module>
     </modules>
@@ -43,6 +44,7 @@
         <jda.version>6.4.1</jda.version>
         <playwright.version>1.52.0</playwright.version>
         <telegrambots.version>9.5.0</telegrambots.version>
+        <larksuite-oapi.version>2.4.2</larksuite-oapi.version>
         <commonmark.version>0.28.0</commonmark.version>
         <testcontainers.version>1.21.4</testcontainers.version>
         <resilience4j.version>2.4.0</resilience4j.version>
@@ -106,6 +108,11 @@
             <dependency>
                 <groupId>ai.gameclaw</groupId>
                 <artifactId>gameclaw-plugin-brave</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.gameclaw</groupId>
+                <artifactId>gameclaw-plugin-feishu</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -27,7 +27,11 @@ GameClaw/
 │   ├── anthropic/           # Anthropic Claude
 │   ├── openai/              # OpenAI GPT
 │   ├── ollama/              # Ollama 本地模型
-│   └── google/              # Google Gemini
+│   ├── google/              # Google Gemini
+│   ├── deepseek/            # DeepSeek (V3/R1)
+│   ├── mistral/             # Mistral AI (Large/Codestral)
+│   ├── minimax/             # MiniMax (Text-01/abab)
+│   └── compat-openai/       # OpenAI 兼容供应商聚合（18 家）
 ├── plugins/                 # 渠道/工具插件
 │   ├── feishu/              # 飞书 Bot
 │   ├── telegram/            # Telegram Bot
@@ -74,6 +78,34 @@ GameClaw/
 | **openai** | OpenAIAgentOnboardingProvider (gpt-5.4) |
 | **ollama** | OllamaAgentOnboardingProvider (qwen3.5:27b, 无需 API Key) |
 | **google** | GoogleGenAIAgentOnboardingProvider (gemini-3-flash-preview) |
+| **deepseek** | DeepSeekAgentOnboardingProvider (deepseek-chat)、DeepSeek-V3 通用对话 / DeepSeek-R1 深度推理 |
+| **mistral** | MistralAgentOnboardingProvider (mistral-large-latest)、Mistral Large 通用对话 / Codestral 代码生成 |
+| **minimax** | MiniMaxAgentOnboardingProvider (MiniMax-Text-01)、中文对话 / 长上下文理解 |
+
+### OpenAI 兼容供应商模块 (compat-openai)
+
+基于 `OpenAICompatibleProvider` 抽象基类，统一复用 `spring-ai-starter-model-openai` + 自定义 `base-url`，所有供应商共享 OpenAI 协议的参数标准化与错误处理。
+
+| 供应商 | 默认模型 | API 端点 | 推荐场景 |
+|--------|----------|----------|----------|
+| **Groq** | llama-3.3-70b-versatile | api.groq.com/openai/v1 | LPU 超低延迟推理、实时对话 |
+| **xAI Grok** | grok-4-latest | api.x.ai/v1 | Grok 系列模型、实时信息 |
+| **OpenRouter** | anthropic/claude-sonnet-4-6 | openrouter.ai/api/v1 | 300+ 模型统一网关、跨供应商路由 |
+| **Hugging Face** | meta-llama/Llama-3.3-70B-Instruct | api-inference.huggingface.co/v1 | 开源模型推理、Serverless API |
+| **GitHub Copilot** | gpt-4o | models.inference.ai.azure.com | GitHub Models、GitHub PAT 认证 |
+| **Qwen (通义千问)** | qwen-max-latest | dashscope.aliyuncs.com/compatible-mode/v1 | 阿里云 DashScope、中文对话 |
+| **Qianfan (千帆)** | ernie-4.5-turbo-128k | qianfan.baidubce.com/v2 | 百度 ERNIE 系列、中文理解 |
+| **Moonshot (Kimi)** | moonshot-v1-128k | api.moonshot.cn/v1 | 长上下文 (128K)、文档理解 |
+| **StepFun (阶跃星辰)** | step-2-16k | api.stepfun.com/v1 | 多模态、Step-2 系列 |
+| **Tencent Cloud (混元)** | hunyuan-turbos-latest | api.hunyuan.cloud.tencent.com/v1 | 腾讯混元、中文对话 |
+| **Volcengine (火山引擎)** | doubao-1.5-pro-32k | ark.cn-beijing.volces.com/api/v3 | 字节豆包、国内合规 |
+| **BytePlus** | skylark-pro-32k | ark.ap-southeast.bytepluses.com/api/v3 | 海外 ModelArk、国际合规 |
+| **Z.AI (智谱 GLM)** | glm-4.5 | open.bigmodel.cn/api/paas/v4 | 智谱 GLM-4.5、代码生成 |
+| **Xiaomi (MiLM)** | mimo-7b-rl | api.xiaomi.com/v1 | 小米 MiLM、轻量推理 |
+| **Alibaba Model Studio** | qwen-max-latest | dashscope-intl.aliyuncs.com/compatible-mode/v1 | 阿里云百炼海外站、国际合规 |
+| **SenseNova (商汤)** | SenseChat-5 | api.sensenova.cn/compatible-mode/v1 | 商汤日日新、多模态 |
+| **Synthetic** | hf:meta-llama/Llama-3.3-70B-Instruct | api.synthetic.new/v1 | 开源模型托管、多模型聚合 |
+| **SiliconFlow (硅基流动)** | Qwen/Qwen2.5-72B-Instruct | api.siliconflow.cn/v1 | 硅基流动 SiliconCloud、开源模型聚合 |
 
 ### 插件模块 (plugins)
 
@@ -93,34 +125,204 @@ GameClaw/
 | Unreal | 151 | U/A/F 前缀 + GEngine/GetWorld |
 | Godot | 196 | GDScript 核心 + Server API |
 
+## 启动后能做什么
+
+### 开箱即用（无需额外配置）
+
+| 能力 | 说明 |
+|------|------|
+| Web 聊天界面 | http://localhost:8090/chat — 角色选择器（策划/程序员/QA 等）、消息输入框、工具列表展示 |
+| 引导向导 | http://localhost:8090/onboarding — 10 步引导配置 LLM 供应商、API Key、角色绑定 |
+| SSE 流式对话 | `/api/chat/sse` 端点可用，支持流式输出 |
+| 角色切换 | 前端可切换 10 种角色，不同角色看到不同工具集 |
+| JobRunr 后台任务 | http://localhost:8091/dashboard — 任务调度面板 |
+| Prometheus 指标 | http://localhost:8090/actuator/prometheus — 7 类 AI 指标 |
+| API 幻觉检测 | 引擎 API 索引已加载（Unity 269 / Unreal 151 / Godot 196），可查询引擎 API |
+
+### 配置 LLM 后可用
+
+完成 Onboarding（选择供应商 + 填 API Key）后，以下能力全部可用：
+
+| 能力 | 工具名 | 说明 |
+|------|--------|------|
+| 生成怪物配置 | `generate_monsters` | 输入描述 → 生成 JSON 配置表 → 写入沙箱 |
+| 生成技能配置 | `generate_skills` | 同上 |
+| 生成道具配置 | `generate_items` | 同上 |
+| 生成任务配置 | `generate_quests` | 同上 |
+| 生成成长曲线 | `generate_growth_curve` | 输入参数 → 生成 CSV → 写入沙箱 |
+| 生成 Unity 脚本 | `generate_unity_script` | 输入需求 → 生成 C# 代码 + API 幻觉检测 → 写入沙箱 |
+| 生成 Unreal 代码 | `generate_unreal_script` | 同上，C++ |
+| 生成 Godot 脚本 | `generate_godot_script` | 同上，GDScript |
+| 查询引擎 API | `query_engine_api` | 自然语言查 API（如"Unity 如何加载场景"→ SceneManager.LoadScene） |
+| 任务创建/调度 | `TaskTool` | 创建一次性/定时/周期任务 |
+| 清单管理 | `CheckListTool` | 创建结构化清单 |
+| MCP 服务器注册 | `McpTool` | 运行时添加 MCP 服务器 |
+| 浏览器自动化 | Playwright 工具 | 导航/点击/填表/截图（需启用 playwright 插件） |
+
+### 配置渠道后可用
+
+| 渠道 | 配置项 | 能力 |
+|------|--------|------|
+| 飞书 | `agent.channels.feishu.app-id/secret` | 飞书群聊对话、卡片消息回复、斜杠命令 |
+| Telegram | `agent.channels.telegram.token` | Bot 对话、用户白名单 |
+| Discord | `agent.channels.discord.token` | Bot 对话、@触发 |
+
+## 使用前准备
+
+### 环境清单
+
+| 依赖 | 最低版本 | 必需 | 说明 |
+|------|----------|------|------|
+| JDK | 25 | ✅ | 下载 [jdk-25](https://jdk.java.net/25/)，设置 `JAVA_HOME` |
+| Maven | 3.9 | ✅ | 构建 + 启动项目 |
+| LLM API Key | — | ✅ | 至少准备一个：Anthropic / OpenAI / Google Gemini / DeepSeek / Mistral / MiniMax / Groq / xAI / OpenRouter / Qwen / Moonshot / Z.AI / SiliconFlow / Ollama 本地 等 25 家供应商 |
+| PostgreSQL | 16 | ❌ | 仅多租户模式需要，单租户用内嵌 H2 |
+| Docker | — | ❌ | 仅 PG16 多租户模式需要 |
+
+### LLM 供应商选择
+
+| 供应商 | 需要 API Key | 配置项 | 推荐场景 |
+|--------|-------------|--------|----------|
+| Ollama | ❌ 无需 | 安装 [Ollama](https://ollama.ai) → `ollama pull qwen3.5:27b` | 本地开发、零成本体验 |
+| Anthropic | ✅ | `spring.ai.anthropic.api-key` | 生产环境、Claude 系列模型 |
+| OpenAI | ✅ | `spring.ai.openai.api-key` | 生产环境、GPT 系列模型 |
+| Google | ✅ | `spring.ai.gemini.api-key` | 生产环境、Gemini 系列模型 |
+| DeepSeek | ✅ | `spring.ai.deepseek.api-key` | 深度推理 (R1)、高性价比对话 (V3)、游戏策划辅助 |
+| Mistral AI | ✅ | `spring.ai.mistral-ai.api-key` | 代码生成 (Codestral)、多语言对话、欧洲合规 |
+| MiniMax | ✅ | `spring.ai.minimax.api-key` | 中文对话、长上下文理解、国内合规 |
+| Groq | ✅ | `spring.ai.openai.api-key` + `base-url: api.groq.com/openai/v1` | LPU 超低延迟推理、实时对话 |
+| xAI Grok | ✅ | `spring.ai.openai.api-key` + `base-url: api.x.ai/v1` | Grok 系列模型、实时信息 |
+| OpenRouter | ✅ | `spring.ai.openai.api-key` + `base-url: openrouter.ai/api/v1` | 300+ 模型统一网关、跨供应商路由 |
+| Hugging Face | ✅ | `spring.ai.openai.api-key` + `base-url: api-inference.huggingface.co/v1` | 开源模型推理、Serverless API |
+| GitHub Copilot | ✅ | `spring.ai.openai.api-key` + `base-url: models.inference.ai.azure.com` | GitHub Models、GitHub PAT 认证 |
+| Qwen (通义千问) | ✅ | `spring.ai.openai.api-key` + `base-url: dashscope.aliyuncs.com/compatible-mode/v1` | 阿里云 DashScope、中文对话 |
+| Qianfan (千帆) | ✅ | `spring.ai.openai.api-key` + `base-url: qianfan.baidubce.com/v2` | 百度 ERNIE 系列、中文理解 |
+| Moonshot (Kimi) | ✅ | `spring.ai.openai.api-key` + `base-url: api.moonshot.cn/v1` | 长上下文 (128K)、文档理解 |
+| StepFun (阶跃星辰) | ✅ | `spring.ai.openai.api-key` + `base-url: api.stepfun.com/v1` | 多模态、Step-2 系列 |
+| Tencent Cloud (混元) | ✅ | `spring.ai.openai.api-key` + `base-url: api.hunyuan.cloud.tencent.com/v1` | 腾讯混元、中文对话 |
+| Volcengine (火山引擎) | ✅ | `spring.ai.openai.api-key` + `base-url: ark.cn-beijing.volces.com/api/v3` | 字节豆包、国内合规 |
+| BytePlus | ✅ | `spring.ai.openai.api-key` + `base-url: ark.ap-southeast.bytepluses.com/api/v3` | 海外 ModelArk、国际合规 |
+| Z.AI (智谱 GLM) | ✅ | `spring.ai.openai.api-key` + `base-url: open.bigmodel.cn/api/paas/v4` | 智谱 GLM-4.5、代码生成 |
+| Xiaomi (MiLM) | ✅ | `spring.ai.openai.api-key` + `base-url: api.xiaomi.com/v1` | 小米 MiLM、轻量推理 |
+| Alibaba Model Studio | ✅ | `spring.ai.openai.api-key` + `base-url: dashscope-intl.aliyuncs.com/compatible-mode/v1` | 阿里云百炼海外站、国际合规 |
+| SenseNova (商汤) | ✅ | `spring.ai.openai.api-key` + `base-url: api.sensenova.cn/compatible-mode/v1` | 商汤日日新、多模态 |
+| Synthetic | ✅ | `spring.ai.openai.api-key` + `base-url: api.synthetic.new/v1` | 开源模型托管、多模型聚合 |
+| SiliconFlow (硅基流动) | ✅ | `spring.ai.openai.api-key` + `base-url: api.siliconflow.cn/v1` | 硅基流动 SiliconCloud、开源模型聚合 |
+
 ## 快速开始
 
-### 环境要求
-
-- JDK 25+
-- Maven 3.9+
-- PostgreSQL 16（多租户模式）
-
-### 启动（H2 单租户模式）
+### 1. 克隆 & 编译
 
 ```bash
+git clone https://github.com/your-org/claw.git
+cd claw/GameClaw
+
+# Windows
+$env:JAVA_HOME = "C:\Program Files\Java\jdk-25"
+
+# macOS / Linux
 export JAVA_HOME=/path/to/jdk-25
+
 mvn compile
+```
+
+### 2. 配置 LLM（二选一）
+
+**方式 A：Ollama 本地模型（零成本）**
+
+```bash
+# 安装 Ollama 并拉取模型
+ollama pull qwen3.5:27b
+```
+
+启动后在 Onboarding 向导中选择 Ollama 即可，无需填写 API Key。
+
+**方式 B：云端 API Key**
+
+创建 `app/src/main/resources/application.private.yaml`（已被 .gitignore 忽略）：
+
+```yaml
+# Anthropic
+spring.ai.anthropic.api-key: sk-ant-xxx
+
+# 或 OpenAI
+spring.ai.openai.api-key: sk-xxx
+
+# 或 Google Gemini
+spring.ai.gemini.api-key: AIzaxxx
+
+# 或 DeepSeek
+spring.ai.deepseek.api-key: sk-xxx
+
+# 或 Mistral AI
+spring.ai.mistral-ai.api-key: xxx
+
+# 或 MiniMax
+spring.ai.minimax.api-key: xxx
+
+# 或 OpenAI 兼容供应商（以 Groq 为例，Onboarding 向导会自动设置 base-url）
+# spring.ai.openai.api-key: gsk_xxx
+# spring.ai.openai.base-url: https://api.groq.com/openai/v1
+```
+
+> `application.yaml` 中已配置 `spring.config.import: optional:classpath:application.private.yaml`，私有配置会自动加载。
+
+### 3. 启动（H2 单租户模式）
+
+```bash
 mvn spring-boot:run -pl app
 ```
 
-启动后访问：
+启动成功后访问：
 - Web 界面：http://localhost:8090
-- 引导向导：http://localhost:8090/onboarding
+- 引导向导：http://localhost:8090/onboarding（首次启动必须完成引导）
 - Prometheus：http://localhost:8090/actuator/prometheus
 - JobRunr：http://localhost:8091/dashboard
 
-### 启动（PG16 多租户模式）
+### 4. 完成 Onboarding 引导
+
+首次启动后访问 http://localhost:8090/onboarding，按步骤完成：
+
+1. 选择 LLM 供应商
+2. 填写 API Key（Ollama 跳过）
+3. 选择默认模型
+4. 绑定用户角色（策划/程序员/QA 等）
+5. 完成后即可开始对话
+
+### 5. 启动（PG16 多租户模式，可选）
 
 ```bash
-cd deploy/docker && docker-compose up -d
-# 修改 application.yaml: datasource.url / flyway.enabled=true / multi-tenancy.enabled=true
+# 启动 PostgreSQL 容器
+cd deploy/docker
+docker-compose up -d
+
+# 修改 app/src/main/resources/application.yaml
+# spring.datasource.url=jdbc:postgresql://localhost:5432/gameclaw
+# spring.datasource.username=linyi
+# spring.datasource.password=your_password
+# spring.flyway.enabled=true
+# gameclaw.multi-tenancy.enabled=true
+
 mvn spring-boot:run -pl app
+```
+
+### 6. 配置渠道（可选）
+
+在 `application.private.yaml` 中添加：
+
+```yaml
+# 飞书
+agent.channels.feishu.app-id: cli_xxx
+agent.channels.feishu.app-secret: xxx
+agent.channels.feishu.verification-token: xxx
+
+# Telegram
+agent.channels.telegram.token: 123456:ABC-xxx
+agent.channels.telegram.username: your_bot
+
+# Discord
+agent.channels.discord.token: your-discord-bot-token
+agent.channels.discord.allowed-user: your-user-id
 ```
 
 ## 配置参考

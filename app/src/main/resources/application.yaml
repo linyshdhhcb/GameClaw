@@ -22,6 +22,27 @@ gameclaw:
         - api.anthropic.com
         - api.openai.com
         - generativelanguage.googleapis.com
+        - api.deepseek.com
+        - api.mistral.ai
+        - api.minimaxi.chat
+        - api.groq.com
+        - api.x.ai
+        - openrouter.ai
+        - api-inference.huggingface.co
+        - models.inference.ai.azure.com
+        - dashscope.aliyuncs.com
+        - dashscope-intl.aliyuncs.com
+        - qianfan.baidubce.com
+        - api.moonshot.cn
+        - api.stepfun.com
+        - api.hunyuan.cloud.tencent.com
+        - ark.cn-beijing.volces.com
+        - ark.ap-southeast.bytepluses.com
+        - open.bigmodel.cn
+        - api.xiaomi.com
+        - api.sensenova.cn
+        - api.synthetic.new
+        - api.siliconflow.cn
         - open.feishu.cn
         - registry.clawhub.io
         - localhost
@@ -47,6 +68,7 @@ spring:
       embedding: unknown
       image: unknown
       moderation: unknown
+      ocr: unknown
   threads:
     virtual:
       enabled: true

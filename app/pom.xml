@@ -37,6 +37,22 @@
         </dependency>
         <dependency>
             <groupId>ai.gameclaw</groupId>
+            <artifactId>gameclaw-provider-deepseek</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ai.gameclaw</groupId>
+            <artifactId>gameclaw-provider-mistral</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ai.gameclaw</groupId>
+            <artifactId>gameclaw-provider-minimax</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ai.gameclaw</groupId>
+            <artifactId>gameclaw-provider-compat-openai</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ai.gameclaw</groupId>
             <artifactId>gameclaw-plugin-discord</artifactId>
         </dependency>
         <dependency>

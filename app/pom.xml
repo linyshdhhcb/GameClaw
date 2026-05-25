@@ -49,10 +49,6 @@
         </dependency>
         <dependency>
             <groupId>ai.gameclaw</groupId>
-            <artifactId>gameclaw-provider-compat-openai</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ai.gameclaw</groupId>
             <artifactId>gameclaw-plugin-discord</artifactId>
         </dependency>
         <dependency>

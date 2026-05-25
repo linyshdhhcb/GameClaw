@@ -50,6 +50,10 @@ gameclaw:
 spring:
   application:
     name: gameclaw
+  messages:
+    basename: i18n/messages
+    fallback-to-system-locale: false
+    encoding: UTF-8
   config:
     import: optional:classpath:application.private.yaml
   datasource:

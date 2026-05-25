@@ -242,28 +242,43 @@ ollama pull qwen3.5:27b
 创建 `app/src/main/resources/application.private.yaml`（已被 .gitignore 忽略）：
 
 ```yaml
+# 必须指定激活的模型供应商（覆盖默认值 unknown）
+spring.ai.model.chat: deepseek
+
 # Anthropic
-spring.ai.anthropic.api-key: sk-ant-xxx
+# spring.ai.model.chat: anthropic
+# spring.ai.anthropic.api-key: sk-ant-xxx
 
 # 或 OpenAI
-spring.ai.openai.api-key: sk-xxx
+# spring.ai.model.chat: openai
+# spring.ai.openai.api-key: sk-xxx
 
 # 或 Google Gemini
-spring.ai.gemini.api-key: AIzaxxx
+# spring.ai.model.chat: gemini
+# spring.ai.gemini.api-key: AIzaxxx
 
 # 或 DeepSeek
-spring.ai.deepseek.api-key: sk-xxx
+# spring.ai.model.chat: deepseek
+# spring.ai.deepseek.api-key: sk-xxx
 
 # 或 Mistral AI
-spring.ai.mistral-ai.api-key: xxx
+# spring.ai.model.chat: mistral-ai
+# spring.ai.mistral-ai.api-key: xxx
 
 # 或 MiniMax
-spring.ai.minimax.api-key: xxx
+# spring.ai.model.chat: minimax
+# spring.ai.minimax.api-key: xxx
+
+# 或 Ollama（本地，无需 API Key）
+# spring.ai.model.chat: ollama
 
 # 或 OpenAI 兼容供应商（以 Groq 为例，Onboarding 向导会自动设置 base-url）
+# spring.ai.model.chat: openai
 # spring.ai.openai.api-key: gsk_xxx
 # spring.ai.openai.base-url: https://api.groq.com/openai/v1
 ```
+
+> **重要**：`spring.ai.model.chat` 是激活模型的关键配置。`application.yaml` 中默认值为 `unknown`（不激活任何模型），必须在 `application.private.yaml` 中显式指定供应商名称，否则聊天会返回"No AI model has been configured"。
 
 > `application.yaml` 中已配置 `spring.config.import: optional:classpath:application.private.yaml`，私有配置会自动加载。
 
@@ -330,6 +345,7 @@ agent.channels.discord.allowed-user: your-user-id
 | 配置项 | 默认值 | 说明 |
 |--------|--------|------|
 | `server.port` | 8090 | HTTP 端口 |
+| `spring.ai.model.chat` | unknown | 激活的聊天模型供应商（anthropic/openai/ollama/gemini/deepseek/mistral-ai/minimax，必须显式指定） |
 | `gameclaw.llm.adapter` | spring-ai | LLM 适配器 (spring-ai / langchain4j) |
 | `gameclaw.workspace` | file:./workspace/ | 工作空间路径 |
 | `gameclaw.multi-tenancy.enabled` | false | 多租户开关 |

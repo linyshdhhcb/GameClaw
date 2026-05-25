@@ -137,6 +137,7 @@ GameClaw/
 | JobRunr 后台任务 | http://localhost:8091/dashboard — 任务调度面板 |
 | Prometheus 指标 | http://localhost:8090/actuator/prometheus — 7 类 AI 指标 |
 | API 幻觉检测 | 引擎 API 索引已加载（Unity 269 / Unreal 151 / Godot 196），可查询引擎 API |
+| 多语言切换 | UI 支持中文/英文切换，URL `?lang=zh` 或 `?lang=en`，Cookie 持久化 |
 
 ### 配置 LLM 后可用
 
@@ -338,6 +339,8 @@ agent.channels.discord.allowed-user: your-user-id
 | `gameclaw.audit.enabled` | true | 审计日志开关 |
 | `spring.threads.virtual.enabled` | true | 虚拟线程开关 |
 | `spring.flyway.enabled` | false | Flyway 迁移开关 |
+| `spring.messages.basename` | i18n/messages | i18n 消息资源路径 |
+| `spring.messages.encoding` | UTF-8 | 消息资源编码 |
 
 ## License
 

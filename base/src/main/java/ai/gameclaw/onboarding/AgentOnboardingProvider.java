@@ -19,8 +19,16 @@ public interface AgentOnboardingProvider {
         return Optional.empty();
     }
 
+    default String backendId() {
+        return getId();
+    }
+
+    default Optional<String> baseUrl() {
+        return Optional.empty();
+    }
+
     default String createPropertyKey(String propertySuffix) {
-        return "spring.ai." + getId() + "." + propertySuffix;
+        return "spring.ai." + backendId() + "." + propertySuffix;
     }
 
     default void saveProperty(Map<String, Object> properties, String propertySuffix, String value) {

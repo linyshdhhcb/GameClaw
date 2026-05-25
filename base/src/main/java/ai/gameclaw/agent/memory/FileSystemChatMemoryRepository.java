@@ -5,6 +5,7 @@ import ai.gameclaw.files.YamlParser;
 import org.springframework.ai.chat.memory.AppendableChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
@@ -39,6 +40,7 @@ import java.util.stream.Stream;
  * </pre>
  */
 @Component
+@ConditionalOnProperty(name = "gameclaw.conversations.storage", havingValue = "filesystem")
 public class FileSystemChatMemoryRepository implements AppendableChatMemoryRepository {
 
     private final Path conversationsDir;

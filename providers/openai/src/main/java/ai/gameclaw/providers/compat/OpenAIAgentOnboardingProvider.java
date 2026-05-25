@@ -1,10 +1,9 @@
-package ai.gameclaw.providers.openai;
+package ai.gameclaw.providers.compat;
 
-import ai.gameclaw.onboarding.AgentOnboardingProvider;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OpenAIAgentOnboardingProvider implements AgentOnboardingProvider {
+public class OpenAIAgentOnboardingProvider extends OpenAICompatibleProvider {
 
     @Override
     public String getId() {
@@ -19,11 +18,6 @@ public class OpenAIAgentOnboardingProvider implements AgentOnboardingProvider {
     @Override
     public String slogan() {
         return "Uses OpenAI API key for ChatGPT as an agent.";
-    }
-
-    @Override
-    public boolean requiresApiKey() {
-        return true;
     }
 
     @Override

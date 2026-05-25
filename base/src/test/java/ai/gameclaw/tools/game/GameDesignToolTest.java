@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.io.FileSystemResource;
 
 import java.io.IOException;
@@ -35,6 +36,9 @@ class GameDesignToolTest {
     @Mock
     AiMetrics aiMetrics;
 
+    @Mock
+    ObjectProvider<AiMetrics> aiMetricsProvider;
+
     List<ValidationGate> gates = List.of();
 
     SandboxWriter sandboxWriter;
@@ -45,7 +49,8 @@ class GameDesignToolTest {
         Path workspace = tempDir.resolve("workspace");
         Files.createDirectories(workspace);
         sandboxWriter = new SandboxWriter(new FileSystemResource(workspace.toFile()));
-        tool = new GameDesignTool(llmClient, sandboxWriter, gates, aiMetrics);
+        when(aiMetricsProvider.getIfAvailable()).thenReturn(aiMetrics);
+        tool = new GameDesignTool(llmClient, sandboxWriter, gates, aiMetricsProvider);
     }
 
     @Test

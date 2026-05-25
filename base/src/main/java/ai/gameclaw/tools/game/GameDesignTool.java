@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
@@ -36,14 +37,15 @@ public class GameDesignTool {
     private final LlmClient llmClient;
     private final SandboxWriter sandboxWriter;
     private final List<ValidationGate> gates;
-    private final AiMetrics aiMetrics;
+    private final ObjectProvider<AiMetrics> aiMetricsProvider;
 
     public GameDesignTool(LlmClient llmClient, SandboxWriter sandboxWriter,
-                          List<ValidationGate> gates, AiMetrics aiMetrics) {
+                          List<ValidationGate> gates,
+                          ObjectProvider<AiMetrics> aiMetricsProvider) {
         this.llmClient = llmClient;
         this.sandboxWriter = sandboxWriter;
         this.gates = gates;
-        this.aiMetrics = aiMetrics;
+        this.aiMetricsProvider = aiMetricsProvider;
     }
 
     @Tool(name = "generate_monsters", description = "根据描述生成怪物配置表，输出JSON写入沙箱目录")
@@ -186,7 +188,7 @@ public class GameDesignTool {
             @SuppressWarnings("unchecked")
             Class<T> type = (Class<T>) (typeRef.getType() instanceof Class<?> c ? c : Object.class);
             var validated = ValidatedLlmOutput.validate(
-                    () -> parsed, type, gates, aiMetrics, toolName, 2);
+                    () -> parsed, type, gates, aiMetricsProvider.getIfAvailable(), toolName, 2);
             if (validated.result() != null) {
                 return validated.result();
             }

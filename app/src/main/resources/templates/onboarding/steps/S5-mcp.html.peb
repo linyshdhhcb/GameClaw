@@ -1,7 +1,7 @@
-<div id="onboarding-step" class="step-fragment">
-    <p class="is-uppercase has-text-weight-semibold has-text-grey is-size-7 mb-3">Step {{ currentStepNumber }} of {{ totalSteps }}</p>
-    <h2 class="title is-3 mb-3">Configure MCP servers.</h2>
-    <p class="subtitle is-5 has-text-grey-dark">Add any MCP servers your agent should connect to. Supports Streamable HTTP and stdio transports. This step is optional.</p>
+﻿<div id="onboarding-step" class="step-fragment">
+    <p class="is-uppercase has-text-weight-semibold has-text-grey is-size-7 mb-3">{{ t("onboarding.step", [currentStepNumber, totalSteps]) }}</p>
+    <h2 class="title is-3 mb-3">{{ t("mcp.title") }}</h2>
+    <p class="subtitle is-5 has-text-grey-dark">{{ t("mcp.subtitle") }}</p>
 
     {% if error %}
     <article class="message is-danger">
@@ -24,7 +24,7 @@
                 <form method="post" action="/onboarding/mcp">
                     <input type="hidden" name="action" value="remove">
                     <input type="hidden" name="serverIndex" value="{{ loop.index }}">
-                    <button type="submit" class="button is-small is-danger is-light">Remove</button>
+                    <button type="submit" class="button is-small is-danger is-light">{{ t("mcp.remove") }}</button>
                 </form>
             </div>
         </div>
@@ -35,21 +35,21 @@
     <form method="post" action="/onboarding/mcp">
         <input type="hidden" name="action" value="add">
         <div class="box">
-            <p class="has-text-weight-semibold mb-4">Add an MCP server</p>
+            <p class="has-text-weight-semibold mb-4">{{ t("mcp.add") }}</p>
 
             <div class="columns">
                 <div class="column">
                     <div class="field">
-                        <label class="label" for="serverName">Name</label>
+                        <label class="label" for="serverName">{{ t("mcp.name") }}</label>
                         <div class="control">
-                            <input id="serverName" class="input" type="text" name="serverName" placeholder="e.g. workspacemcp" autocomplete="off">
+                            <input id="serverName" class="input" type="text" name="serverName" placeholder="{{ t("mcp.name.placeholder") }}" autocomplete="off">
                         </div>
-                        <p class="help">Connection identifier — letters, numbers, hyphens, underscores.</p>
+                        <p class="help">{{ t("mcp.name.help") }}</p>
                     </div>
                 </div>
                 <div class="column is-narrow">
                     <div class="field">
-                        <label class="label" for="serverType">Transport</label>
+                        <label class="label" for="serverType">{{ t("mcp.transport") }}</label>
                         <div class="control">
                             <div class="select">
                                 <select id="serverType" name="serverType" onchange="mcpToggleType(this.value)">
@@ -64,15 +64,15 @@
 
             <div id="mcpHttpFields">
                 <div class="field">
-                    <label class="label" for="serverUrl">URL</label>
+                    <label class="label" for="serverUrl">{{ t("mcp.url") }}</label>
                     <div class="control">
-                        <input id="serverUrl" class="input" type="text" name="serverUrl" placeholder="http://localhost:8000/mcp" autocomplete="off">
+                        <input id="serverUrl" class="input" type="text" name="serverUrl" placeholder="{{ t("mcp.url.placeholder") }}" autocomplete="off">
                     </div>
                 </div>
                 <div class="field">
                     <label class="label" for="serverHeaders">
-                        Headers
-                        <span class="has-text-weight-normal has-text-grey is-size-7 ml-1">(optional — one per line: <code>Key: Value</code>)</span>
+                        {{ t("mcp.headers") }}
+                        <span class="has-text-weight-normal has-text-grey is-size-7 ml-1">{{ t("mcp.headers.hint") }}</span>
                     </label>
                     <div class="control">
                         <textarea id="serverHeaders" class="textarea is-small" name="serverHeaders" rows="3"
@@ -83,15 +83,15 @@
 
             <div id="mcpStdioFields" style="display:none">
                 <div class="field">
-                    <label class="label" for="serverCommand">Command</label>
+                    <label class="label" for="serverCommand">{{ t("mcp.command") }}</label>
                     <div class="control">
-                        <input id="serverCommand" class="input" type="text" name="serverCommand" placeholder="npx" autocomplete="off">
+                        <input id="serverCommand" class="input" type="text" name="serverCommand" placeholder="{{ t("mcp.command.placeholder") }}" autocomplete="off">
                     </div>
                 </div>
                 <div class="field">
                     <label class="label" for="serverArgs">
-                        Arguments
-                        <span class="has-text-weight-normal has-text-grey is-size-7 ml-1">(optional — one per line)</span>
+                        {{ t("mcp.args") }}
+                        <span class="has-text-weight-normal has-text-grey is-size-7 ml-1">{{ t("mcp.args.hint") }}</span>
                     </label>
                     <div class="control">
                         <textarea id="serverArgs" class="textarea is-small" name="serverArgs" rows="3"
@@ -100,8 +100,8 @@
                 </div>
                 <div class="field">
                     <label class="label" for="serverEnv">
-                        Environment variables
-                        <span class="has-text-weight-normal has-text-grey is-size-7 ml-1">(optional — one per line: <code>KEY=VALUE</code>)</span>
+                        {{ t("mcp.env") }}
+                        <span class="has-text-weight-normal has-text-grey is-size-7 ml-1">{{ t("mcp.env.hint") }}</span>
                     </label>
                     <div class="control">
                         <textarea id="serverEnv" class="textarea is-small" name="serverEnv" rows="3"
@@ -111,7 +111,7 @@
             </div>
 
             <div class="buttons mt-3">
-                <button class="button is-info" type="submit">Add server</button>
+                <button class="button is-info" type="submit">{{ t("mcp.addserver") }}</button>
             </div>
         </div>
     </form>
@@ -119,9 +119,9 @@
     <form method="post" action="/onboarding/mcp">
         <input type="hidden" name="action" value="continue">
         <div class="buttons mt-4">
-            <a class="button is-light is-medium" href="{{ previousStepUrl }}">Back</a>
-            <button class="button is-primary is-medium" type="submit">Continue</button>
-            {% if isOptional %}<a class="button is-ghost is-medium" href="{{ nextStepUrl }}">Skip</a>{% endif %}
+            <a class="button is-light is-medium" href="{{ previousStepUrl }}">{{ t("provider.back") }}</a>
+            <button class="button is-primary is-medium" type="submit">{{ t("provider.continue") }}</button>
+            {% if isOptional %}<a class="button is-ghost is-medium" href="{{ nextStepUrl }}">{{ t("mcp.skip") }}</a>{% endif %}
         </div>
     </form>
 

@@ -1,6 +1,6 @@
-{% extends "../base" %}
+﻿{% extends "../base" %}
 
-{% block title %} Onboarding{% endblock %}
+{% block title %} {{ t("onboarding.title") }}{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@samlam140330/bulma-timeline@1.0.3/dist/css/bulma-timeline.min.css">
@@ -49,7 +49,6 @@
         to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* Timeline overrides for dark sidebar */
     .sidebar-timeline .timeline-item::before {
         background-color: rgba(255, 255, 255, 0.15);
     }
@@ -76,12 +75,12 @@
             <div class="column is-5">
                 <aside class="box has-background-dark has-text-white">
                     <div class="brand-lockup mb-5">
-                        <p class="is-size-7 has-text-primary has-text-weight-bold is-uppercase mb-1" style="letter-spacing: 0.1em">Setup Wizard</p>
+                        <p class="is-size-7 has-text-primary has-text-weight-bold is-uppercase mb-1" style="letter-spacing: 0.1em">{{ t("onboarding.sidebar.setup") }}</p>
                         <p class="brand-word mb-0"><span class="brand-agent">Java</span><span class="brand-runr">Claw</span></p>
                     </div>
-                    <h1 class="title is-3 has-text-white mb-3">Turn a blank install into a ready-to-run assistant.</h1>
-                    <p class="has-text-grey-light mb-5">Choose a model provider, save credentials, tune your workspace instructions, and mark onboarding complete for the next restart.</p>
-                    <p class="is-size-7 has-text-grey mb-5 has-text-centered">Powered by <a href="https://spring.io/projects/spring-ai" target="_blank" rel="noopener noreferrer" class="has-text-grey-light">Spring AI</a> &amp; <a href="https://www.jobrunr.io" target="_blank" rel="noopener noreferrer" class="has-text-grey-light">JobRunr</a></p>
+                    <h1 class="title is-3 has-text-white mb-3">{{ t("onboarding.sidebar.title") }}</h1>
+                    <p class="has-text-grey-light mb-5">{{ t("onboarding.sidebar.desc") }}</p>
+                    <p class="is-size-7 has-text-grey mb-5 has-text-centered">{{ t("onboarding.sidebar.powered", ["Spring AI", "JobRunr"]) }}</p>
 
                     <div class="timeline no-headers sidebar-timeline">
                         {% for step in steps %}
@@ -92,11 +91,18 @@
                             </div>
                             <div class="timeline-content">
                                 <p class="is-size-6{% if stepNum == currentStepNumber %} has-text-white has-text-weight-semibold{% elseif stepNum < currentStepNumber %} has-text-grey-light{% else %} has-text-grey-light{% endif %}">
-                                    {{ step.title }}{% if step.optional %} <span class="is-size-7 has-text-grey ml-1">(optional)</span>{% endif %}
+                                    {{ step.title }}{% if step.optional %} <span class="is-size-7 has-text-grey ml-1">{{ t("onboarding.sidebar.optional") }}</span>{% endif %}
                                 </p>
                             </div>
                         </div>
                         {% endfor %}
+                    </div>
+
+                    <div class="mt-5 has-text-centered">
+                        <div class="lang-switch" style="justify-content: center;">
+                            <a href="?lang=en" style="color: rgba(255,255,255,.5);" {% if locale.language == "en" %}class="is-active"{% endif %}>{{ t("lang.en") }}</a>
+                            <a href="?lang=zh" style="color: rgba(255,255,255,.5);" {% if locale.language == "zh" %}class="is-active"{% endif %}>{{ t("lang.zh") }}</a>
+                        </div>
                     </div>
                 </aside>
             </div>

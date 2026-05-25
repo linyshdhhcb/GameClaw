@@ -1,6 +1,6 @@
-<html lang="en">
+﻿<html lang="{{ locale.language }}">
 <head>
-    <title>GameClaw{% block title %}{% endblock %}</title>
+    <title>{{ t("app.title") }}{% block title %}{% endblock %}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
@@ -16,6 +16,27 @@
     }
     .brand-word .brand-agent { color: #fff; }
     .brand-word .brand-runr  { color: var(--bulma-primary); }
+    .lang-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: .25rem;
+        font-size: .8rem;
+    }
+    .lang-switch a {
+        color: rgba(255,255,255,.5);
+        text-decoration: none;
+        padding: .15rem .4rem;
+        border-radius: .25rem;
+        transition: color .15s, background .15s;
+    }
+    .lang-switch a:hover {
+        color: #fff;
+        background: rgba(255,255,255,.1);
+    }
+    .lang-switch a.is-active {
+        color: var(--bulma-primary);
+        font-weight: 600;
+    }
     </style>
     {% block head %}{% endblock %}
 </head>

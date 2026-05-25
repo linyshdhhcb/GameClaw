@@ -1,14 +1,14 @@
-<div id="onboarding-step" class="step-fragment">
-    <p class="is-uppercase has-text-weight-semibold has-text-grey is-size-7 mb-3">Step {{ currentStepNumber }} of {{ totalSteps }}</p>
-    <h2 class="title is-3 mb-3"><span class="brand-word" style="font-size: inherit">Java<span class="brand-runr">Claw</span></span> is configured.</h2>
-    <p class="subtitle is-5 has-text-grey-dark">All settings have been saved and setup is complete. You can now start interacting with your agent through Telegram.</p>
+﻿<div id="onboarding-step" class="step-fragment">
+    <p class="is-uppercase has-text-weight-semibold has-text-grey is-size-7 mb-3">{{ t("onboarding.step", [currentStepNumber, totalSteps]) }}</p>
+    <h2 class="title is-3 mb-3">{{ t("complete.title") }}</h2>
+    <p class="subtitle is-5 has-text-grey-dark">{{ t("complete.subtitle") }}</p>
 
     <div class="notification is-light content">
-        <p><strong>Provider:</strong> {{ providerLabel }}</p>
-        <p><strong>Status:</strong> ready for your questions!</p>
+        <p><strong>{{ t("complete.provider") }}</strong> {{ providerLabel }}</p>
+        <p><strong>{{ t("complete.status") }}</strong> {{ t("complete.status.ready") }}</p>
     </div>
 
     <div class="buttons mt-4">
-        <a class="button is-primary is-medium" href="/chat" hx-boost="false">Start chatting</a>
+        <a class="button is-primary is-medium" href="/chat" hx-boost="false">{{ t("complete.start") }}</a>
     </div>
 </div>

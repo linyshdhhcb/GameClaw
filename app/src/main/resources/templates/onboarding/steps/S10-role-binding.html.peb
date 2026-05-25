@@ -1,7 +1,7 @@
-<div id="onboarding-step" class="step-fragment">
-    <p class="is-uppercase has-text-weight-semibold has-text-grey is-size-7 mb-3">Step {{ currentStepNumber }} of {{ totalSteps }}</p>
-    <h2 class="title is-3 mb-3">Select your role.</h2>
-    <p class="subtitle is-5 has-text-grey-dark">Choose the role that best describes your primary function. This determines which tools and risk levels you can access.</p>
+﻿<div id="onboarding-step" class="step-fragment">
+    <p class="is-uppercase has-text-weight-semibold has-text-grey is-size-7 mb-3">{{ t("onboarding.step", [currentStepNumber, totalSteps]) }}</p>
+    <h2 class="title is-3 mb-3">{{ t("role.title") }}</h2>
+    <p class="subtitle is-5 has-text-grey-dark">{{ t("role.subtitle") }}</p>
 
     {% if error %}
     <article class="message is-danger">
@@ -25,10 +25,10 @@
         </div>
 
         <div class="buttons mt-4">
-            <a class="button is-light is-medium" href="{{ previousStepUrl }}">Back</a>
-            <button class="button is-primary is-medium" type="submit">Continue</button>
+            <a class="button is-light is-medium" href="{{ previousStepUrl }}">{{ t("provider.back") }}</a>
+            <button class="button is-primary is-medium" type="submit">{{ t("provider.continue") }}</button>
             {% if isOptional %}
-            <a class="button is-ghost is-medium" href="{{ nextStepUrl }}">Skip</a>
+            <a class="button is-ghost is-medium" href="{{ nextStepUrl }}">{{ t("mcp.skip") }}</a>
             {% endif %}
         </div>
     </form>

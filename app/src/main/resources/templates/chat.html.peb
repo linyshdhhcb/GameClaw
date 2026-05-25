@@ -1,6 +1,6 @@
-{% extends "base" %}
+﻿{% extends "base" %}
 
-{% block title %} Chat{% endblock %}
+{% block title %} {{ t("chat.title") }}{% endblock %}
 
 {% block head %}
 <style>
@@ -212,22 +212,27 @@
                 <div class="select is-small is-dark" id="channel-selector"></div>
             </div>
             <div class="navbar-item">
-                <select id="role-selector" title="Select Role">
-                    <option value="PROGRAMMER">游戏程序员</option>
+                <select id="role-selector" title="{{ t("chat.role.select") }}">
                 </select>
             </div>
             <div class="navbar-item">
                 <a href="/onboarding" class="button is-small is-dark">
-                    <span>Settings</span>
+                    <span>{{ t("chat.nav.settings") }}</span>
                 </a>
             </div>
             <div class="navbar-item">
                 <a href="http://localhost:{{ jobrunrDashboardPort }}" target="_blank" rel="noopener noreferrer" class="button is-small is-dark">
-                    <span>JobRunr Dashboard</span>
+                    <span>{{ t("chat.nav.jobrunr") }}</span>
                 </a>
             </div>
             <div class="navbar-item">
-                <span id="status-tag" class="tag is-success is-light is-rounded">Connected</span>
+                <span id="status-tag" class="tag is-success is-light is-rounded">{{ t("chat.status.connected") }}</span>
+            </div>
+            <div class="navbar-item">
+                <div class="lang-switch">
+                    <a href="?lang=en" {% if locale.language == "en" %}class="is-active"{% endif %}>{{ t("lang.en") }}</a>
+                    <a href="?lang=zh" {% if locale.language == "zh" %}class="is-active"{% endif %}>{{ t("lang.zh") }}</a>
+                </div>
             </div>
         </div>
     </nav>
@@ -248,13 +253,13 @@
                 <div class="field is-grouped" style="align-items: flex-end; margin: 0;">
                     <div class="control is-expanded">
                         <textarea id="message-input" class="textarea" name="message" rows="1"
-                            placeholder="Message GameClaw…"
+                            placeholder="{{ t("chat.input.placeholder") }}"
                             autocomplete="off" spellcheck="true" autofocus
                             hx-trigger="keydown[key=='Enter'&&!shiftKey] consume"
                             ws-send></textarea>
                     </div>
                     <div class="control">
-                        <button id="send-btn" type="submit" class="button is-primary" title="Send (Enter)">
+                        <button id="send-btn" type="submit" class="button is-primary" title="{{ t("chat.send.title") }}">
                             <span class="icon">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
                                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
@@ -324,9 +329,13 @@
 
     loadRoles();
 
+    var msgConnected = '{{ t("chat.status.connected") }}';
+    var msgReconnecting = '{{ t("chat.status.reconnecting") }}';
+    var msgError = '{{ t("chat.status.error") }}';
+
     document.body.addEventListener('htmx:wsOpen', function () {
         statusTag.className = 'tag is-success is-light is-rounded';
-        statusTag.textContent = 'Connected';
+        statusTag.textContent = msgConnected;
         var ta = document.getElementById('message-input');
         var btn = document.getElementById('send-btn');
         if (ta) ta.disabled = false;
@@ -334,7 +343,7 @@
     });
     document.body.addEventListener('htmx:wsClose', function () {
         statusTag.className = 'tag is-warning is-light is-rounded';
-        statusTag.textContent = 'Reconnecting…';
+        statusTag.textContent = msgReconnecting;
         var ta = document.getElementById('message-input');
         var btn = document.getElementById('send-btn');
         if (ta) ta.disabled = true;
@@ -342,7 +351,7 @@
     });
     document.body.addEventListener('htmx:wsError', function () {
         statusTag.className = 'tag is-danger is-light is-rounded';
-        statusTag.textContent = 'Connection error';
+        statusTag.textContent = msgError;
     });
     document.body.addEventListener('keydown', function (e) {
         if (e.target.id === 'message-input' && e.key === 'Enter' && !e.shiftKey) {

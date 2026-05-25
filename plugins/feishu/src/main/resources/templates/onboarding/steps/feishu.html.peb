@@ -1,0 +1,40 @@
+<div id="onboarding-step" class="step-fragment">
+    <p class="is-uppercase has-text-weight-semibold has-text-grey is-size-7 mb-3">Step {{ currentStepNumber }} of {{ totalSteps }}</p>
+    <h2 class="title is-3 mb-3">Connect Feishu Bot.</h2>
+    <p class="subtitle is-5 has-text-grey-dark">Register a Feishu custom app, then enter the credentials below. Event subscription URL: <code>/api/feishu/event</code></p>
+
+    {% if error %}
+    <article class="message is-danger">
+        <div class="message-body">{{ error }}</div>
+    </article>
+    {% endif %}
+
+    <form method="post" action="/onboarding/feishu">
+        <div class="field">
+            <label class="label">App ID</label>
+            <div class="control">
+                <input class="input" type="text" name="feishuAppId" value="{{ feishuAppId }}" placeholder="cli_xxxxxxxxxxxx" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">App Secret</label>
+            <div class="control">
+                <input class="input" type="password" name="feishuAppSecret" value="{{ feishuAppSecret }}" placeholder="Your app secret" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Verification Token <span class="has-text-grey">(optional)</span></label>
+            <div class="control">
+                <input class="input" type="text" name="feishuVerificationToken" value="{{ feishuVerificationToken }}" placeholder="For signature verification">
+            </div>
+        </div>
+
+        <div class="buttons mt-4">
+            <a class="button is-light is-medium" href="{{ previousStepUrl }}">Back</a>
+            <button class="button is-primary is-medium" type="submit">Continue</button>
+            <a class="button is-ghost is-medium" href="{{ nextStepUrl }}">Skip</a>
+        </div>
+    </form>
+</div>

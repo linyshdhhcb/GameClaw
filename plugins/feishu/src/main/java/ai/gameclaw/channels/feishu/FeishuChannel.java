@@ -79,7 +79,12 @@ public class FeishuChannel implements Channel {
             }
 
             if (response != null && !response.isBlank()) {
-                apiClient.sendTextMessage(chatId, response);
+                String cardJson = FeishuCardBuilder.wrapResponse(response);
+                if (cardJson != null) {
+                    apiClient.sendCardMessage(chatId, cardJson);
+                } else {
+                    apiClient.sendTextMessage(chatId, response);
+                }
             }
         });
     }

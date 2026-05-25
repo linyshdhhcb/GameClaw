@@ -1,4 +1,4 @@
-﻿{% extends "base" %}
+{% extends "base" %}
 
 {% block title %} {{ t("chat.title") }}{% endblock %}
 
@@ -9,12 +9,14 @@
     inset: 0;
     display: flex;
     flex-direction: column;
-    background-color: hsl(229, 18%, 8%);
+    background: var(--gc-bg);
+    background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(34, 197, 94, 0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(59, 130, 246, 0.03) 0%, transparent 50%);
 }
 
 .chat-page > .navbar {
     flex-shrink: 0;
-    border-bottom: 1px solid rgba(255, 255, 255, .06);
 }
 
 .chat-body {
@@ -24,7 +26,7 @@
     scroll-behavior: smooth;
 }
 .chat-body::-webkit-scrollbar { width: 4px; }
-.chat-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 4px; }
+.chat-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,.08); border-radius: 4px; }
 
 .chat-body .container {
     display: flex;
@@ -57,38 +59,52 @@
 
 .ar-msg__avatar {
     flex-shrink: 0;
-    width: 30px; height: 30px;
+    width: 32px; height: 32px;
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: .58rem; font-weight: 800; letter-spacing: .04em;
-    background: hsl(160, 30%, 14%);
-    border: 1px solid color-mix(in srgb, var(--bulma-primary) 30%, transparent);
-    color: var(--bulma-primary);
+    font-size: .55rem; font-weight: 800; letter-spacing: .04em;
+    font-family: var(--gc-font-mono);
+    background: var(--gc-surface);
+    border: 1px solid var(--gc-border-accent);
+    color: var(--gc-accent);
 }
 
 .ar-msg__bubble {
-    padding: .6rem .95rem;
-    border-radius: 1.1rem;
+    padding: .65rem 1rem;
+    border-radius: var(--gc-radius-lg);
     line-height: 1.65;
     white-space: pre-wrap;
     word-break: break-word;
 }
 .ar-msg--user  .ar-msg__bubble {
-    background: var(--bulma-primary);
+    background: linear-gradient(135deg, var(--gc-accent), #16a34a);
     color: #fff;
-    border-bottom-right-radius: .25rem;
-    box-shadow: 0 3px 14px color-mix(in srgb, var(--bulma-primary) 40%, transparent);
+    border-bottom-right-radius: 6px;
+    box-shadow: 0 4px 16px var(--gc-accent-glow);
 }
 .ar-msg--agent .ar-msg__bubble,
 .ar-typing__dots {
-    background: hsl(228, 22%, 13%);
-    border: 1px solid rgba(255, 255, 255, .07);
-    border-radius: 1.1rem;
-    border-bottom-left-radius: .25rem;
+    background: var(--gc-glass-bg);
+    backdrop-filter: var(--gc-blur);
+    -webkit-backdrop-filter: var(--gc-blur);
+    border: 1px solid var(--gc-border);
+    border-radius: var(--gc-radius-lg);
+    border-bottom-left-radius: 6px;
+    position: relative;
+}
+.ar-msg--agent .ar-msg__bubble::before,
+.ar-typing__dots::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
 }
 
 .ar-msg--agent .ar-msg__bubble {
-    color: #c8cee0;
+    color: var(--gc-text);
 }
 
 .ar-typing { display: flex; align-items: flex-end; gap: .55rem; padding-top: .5rem; animation: msg-in .22s cubic-bezier(.22,1,.36,1); }
@@ -98,7 +114,8 @@
 }
 .ar-typing__dots span {
     display: block; width: 6px; height: 6px; border-radius: 50%;
-    background: color-mix(in srgb, var(--bulma-primary) 65%, transparent);
+    background: var(--gc-accent);
+    opacity: .4;
     animation: bounce 1.2s ease infinite;
 }
 .ar-typing__dots span:nth-child(2) { animation-delay: .15s; }
@@ -111,74 +128,59 @@
 .chat-footer {
     flex-shrink: 0;
     padding: .875rem 1.5rem 1rem;
-    border-top: 1px solid rgba(255, 255, 255, .06);
-    background: hsl(229, 22%, 7%);
+    border-top: 1px solid var(--gc-border);
+    background: var(--gc-glass-bg-heavy);
+    backdrop-filter: var(--gc-blur-heavy);
+    -webkit-backdrop-filter: var(--gc-blur-heavy);
 }
 
 .chat-footer .textarea {
-    background: hsl(229, 20%, 12%);
-    border-color: rgba(255, 255, 255, .1);
-    color: #d8dde8;
-    border-radius: .75rem;
+    background: var(--gc-surface);
+    border-color: var(--gc-border);
+    color: var(--gc-text);
+    border-radius: var(--gc-radius-md);
     resize: none;
     overflow-y: hidden;
     min-height: 2.75rem;
     max-height: 9rem;
     padding: .6rem .9rem;
     line-height: 1.5;
-    transition: border-color .15s, box-shadow .15s;
+    font-family: var(--gc-font);
+    transition: border-color var(--gc-transition), box-shadow var(--gc-transition);
 }
-.chat-footer .textarea::placeholder { color: rgba(180, 195, 235, .28); }
+.chat-footer .textarea::placeholder { color: var(--gc-text-dim); }
 .chat-footer .textarea:focus {
-    border-color: var(--bulma-primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--bulma-primary) 16%, transparent);
+    border-color: var(--gc-accent);
+    box-shadow: 0 0 0 3px var(--gc-accent-glow);
 }
 .chat-footer .button.is-primary {
-    border-radius: .75rem;
+    border-radius: var(--gc-radius-md);
     height: 2.75rem;
     align-self: flex-end;
-    box-shadow: 0 3px 12px color-mix(in srgb, var(--bulma-primary) 45%, transparent);
+    background: var(--gc-accent);
+    border-color: var(--gc-accent);
+    box-shadow: var(--gc-shadow-glow);
+    transition: transform var(--gc-transition), box-shadow var(--gc-transition);
 }
-
-.chat-readonly-notice {
-    color: rgba(180, 195, 235, .45);
-    font-size: .875rem;
-    text-align: center;
-    padding: .4rem 0;
-}
-.chat-readonly-notice strong {
-    color: rgba(180, 195, 235, .7);
+.chat-footer .button.is-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 28px var(--gc-accent-glow);
 }
 
 #role-selector {
-    background: hsl(229, 20%, 12%);
-    border-color: rgba(255, 255, 255, .1);
-    color: #d8dde8;
-    border-radius: .5rem;
+    background: var(--gc-surface);
+    border-color: var(--gc-border);
+    color: var(--gc-text);
+    border-radius: var(--gc-radius-sm);
     font-size: .8rem;
+    font-family: var(--gc-font);
     padding: .25rem .5rem;
     cursor: pointer;
 }
 #role-selector:focus {
-    border-color: var(--bulma-primary);
+    border-color: var(--gc-accent);
     outline: none;
-}
-
-.role-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: .3rem;
-    padding: .2rem .6rem;
-    border-radius: .5rem;
-    font-size: .75rem;
-    background: hsl(229, 20%, 15%);
-    border: 1px solid rgba(255, 255, 255, .08);
-    color: rgba(200, 206, 224, .8);
-}
-.role-badge--active {
-    background: color-mix(in srgb, var(--bulma-primary) 20%, transparent);
-    border-color: color-mix(in srgb, var(--bulma-primary) 40%, transparent);
-    color: var(--bulma-primary);
+    box-shadow: 0 0 0 2px var(--gc-accent-glow);
 }
 
 #tool-list {
@@ -189,9 +191,25 @@
 }
 #tool-list .tag {
     font-size: .7rem;
-    background: hsl(229, 20%, 15%);
-    color: rgba(200, 206, 224, .6);
-    border: 1px solid rgba(255, 255, 255, .05);
+    font-family: var(--gc-font-mono);
+    background: var(--gc-glass-bg);
+    backdrop-filter: blur(8px);
+    color: var(--gc-text-muted);
+    border: 1px solid var(--gc-border);
+    border-radius: 6px;
+}
+
+.navbar-item .button.is-dark {
+    background: var(--gc-glass-bg);
+    border: 1px solid var(--gc-border);
+    color: var(--gc-text-muted);
+    border-radius: var(--gc-radius-sm);
+    transition: background var(--gc-transition), border-color var(--gc-transition);
+}
+.navbar-item .button.is-dark:hover {
+    background: rgba(255,255,255,.1);
+    border-color: var(--gc-border-accent);
+    color: var(--gc-text);
 }
 </style>
 {% endblock %}
@@ -199,11 +217,11 @@
 {% block content %}
 <div class="chat-page" hx-ext="ws" ws-connect="/ws/chat">
 
-    <nav class="navbar has-background-dark" role="navigation" aria-label="main navigation">
+    <nav class="navbar glass-nav" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
             <span class="navbar-item">
                 <div class="brand-lockup">
-                    <p class="brand-word"><span class="brand-agent">Java</span><span class="brand-runr">Claw</span></p>
+                    <p class="brand-word"><span class="brand-agent">Game</span><span class="brand-runr">Claw</span></p>
                 </div>
             </span>
         </div>
@@ -212,7 +230,7 @@
                 <div class="select is-small is-dark" id="channel-selector"></div>
             </div>
             <div class="navbar-item">
-                <select id="role-selector" title="{{ t("chat.role.select") }}">
+                <select id="role-selector" aria-label="{{ t("chat.role.select") }}">
                 </select>
             </div>
             <div class="navbar-item">
@@ -259,7 +277,7 @@
                             ws-send></textarea>
                     </div>
                     <div class="control">
-                        <button id="send-btn" type="submit" class="button is-primary" title="{{ t("chat.send.title") }}">
+                        <button id="send-btn" type="submit" class="button is-primary" aria-label="{{ t("chat.send.title") }}">
                             <span class="icon">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
                                     <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>

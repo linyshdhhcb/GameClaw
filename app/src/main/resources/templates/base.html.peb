@@ -1,21 +1,56 @@
-﻿<html lang="{{ locale.language }}">
+<html lang="{{ locale.language }}">
 <head>
     <title>{{ t("app.title") }}{% block title %}{% endblock %}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
     <style>
+    :root {
+        --gc-bg: #020617;
+        --gc-surface: #0F172A;
+        --gc-surface-2: #1E293B;
+        --gc-accent: #22C55E;
+        --gc-accent-glow: rgba(34, 197, 94, 0.25);
+        --gc-text: #F8FAFC;
+        --gc-text-muted: rgba(248, 250, 252, 0.6);
+        --gc-text-dim: rgba(248, 250, 252, 0.35);
+        --gc-border: rgba(255, 255, 255, 0.1);
+        --gc-border-accent: rgba(34, 197, 94, 0.3);
+        --gc-glass-bg: rgba(15, 23, 42, 0.6);
+        --gc-glass-bg-heavy: rgba(15, 23, 42, 0.85);
+        --gc-blur: blur(16px);
+        --gc-blur-heavy: blur(24px);
+        --gc-radius-sm: 8px;
+        --gc-radius-md: 16px;
+        --gc-radius-lg: 24px;
+        --gc-radius-xl: 32px;
+        --gc-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        --gc-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+        --gc-shadow-glow: 0 0 20px var(--gc-accent-glow);
+        --gc-font: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --gc-font-mono: 'Fira Code', 'SFMono-Regular', 'Menlo', monospace;
+        --gc-transition: 0.2s ease;
+    }
+    body {
+        font-family: var(--gc-font);
+        background: var(--gc-bg);
+        color: var(--gc-text);
+    }
     .brand-lockup {
-        border-left: 3px solid var(--bulma-primary);
+        border-left: 3px solid var(--gc-accent);
         padding-left: .65rem;
         line-height: 1.15;
     }
     .brand-word {
         font-size: 1.1rem;
         font-weight: 800;
+        font-family: var(--gc-font-mono);
     }
     .brand-word .brand-agent { color: #fff; }
-    .brand-word .brand-runr  { color: var(--bulma-primary); }
+    .brand-word .brand-runr  { color: var(--gc-accent); }
     .lang-switch {
         display: inline-flex;
         align-items: center;
@@ -23,19 +58,50 @@
         font-size: .8rem;
     }
     .lang-switch a {
-        color: rgba(255,255,255,.5);
+        color: var(--gc-text-muted);
         text-decoration: none;
         padding: .15rem .4rem;
-        border-radius: .25rem;
-        transition: color .15s, background .15s;
+        border-radius: var(--gc-radius-sm);
+        transition: color var(--gc-transition), background var(--gc-transition);
     }
     .lang-switch a:hover {
         color: #fff;
-        background: rgba(255,255,255,.1);
+        background: rgba(255, 255, 255, .1);
     }
     .lang-switch a.is-active {
-        color: var(--bulma-primary);
+        color: var(--gc-accent);
         font-weight: 600;
+    }
+    .glass-card {
+        background: var(--gc-glass-bg);
+        backdrop-filter: var(--gc-blur);
+        -webkit-backdrop-filter: var(--gc-blur);
+        border: 1px solid var(--gc-border);
+        border-radius: var(--gc-radius-md);
+        box-shadow: var(--gc-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+    .glass-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    }
+    .glass-nav {
+        background: var(--gc-glass-bg-heavy);
+        backdrop-filter: var(--gc-blur-heavy);
+        -webkit-backdrop-filter: var(--gc-blur-heavy);
+        border-bottom: 1px solid var(--gc-border);
+    }
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+        }
     }
     </style>
     {% block head %}{% endblock %}

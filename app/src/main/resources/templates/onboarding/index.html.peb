@@ -1,63 +1,116 @@
-﻿{% extends "../base" %}
+{% extends "../base" %}
 
 {% block title %} {{ t("onboarding.title") }}{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@samlam140330/bulma-timeline@1.0.3/dist/css/bulma-timeline.min.css">
 <style>
+    .onboarding-page {
+        min-height: 100vh;
+        background: var(--gc-bg);
+        background-image:
+            radial-gradient(ellipse at 10% 90%, rgba(34, 197, 94, 0.06) 0%, transparent 50%),
+            radial-gradient(ellipse at 90% 10%, rgba(59, 130, 246, 0.04) 0%, transparent 50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+    }
+    .onboarding-layout {
+        max-width: 960px;
+        width: 100%;
+        display: flex;
+        gap: 1.5rem;
+    }
+    .onboarding-sidebar {
+        flex: 0 0 340px;
+    }
+    .onboarding-sidebar .glass-card {
+        padding: 2rem;
+        height: 100%;
+    }
+    .onboarding-main {
+        flex: 1;
+        min-width: 0;
+    }
+    .onboarding-main .glass-card {
+        padding: 2rem;
+    }
     .provider-card {
-        border: 2px solid var(--bulma-border);
-        border-radius: var(--bulma-radius-large);
-        padding: 1rem;
-        transition: border-color 140ms ease, box-shadow 140ms ease;
+        border: 1px solid var(--gc-border);
+        border-radius: var(--gc-radius-md);
+        padding: 1.25rem;
+        transition: border-color var(--gc-transition), box-shadow var(--gc-transition), background var(--gc-transition);
         cursor: pointer;
         display: block;
-        background: var(--bulma-white);
+        background: var(--gc-glass-bg);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        position: relative;
+        overflow: hidden;
     }
-
+    .provider-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
+    }
     .provider-card:hover {
-        border-color: var(--bulma-primary);
-        box-shadow: var(--bulma-shadow);
+        border-color: var(--gc-border-accent);
+        box-shadow: var(--gc-shadow-glow);
+        background: rgba(15, 23, 42, 0.8);
     }
-
     .provider-card.is-selected {
-        border-color: var(--bulma-primary);
-        box-shadow: var(--bulma-shadow);
+        border-color: var(--gc-accent);
+        box-shadow: var(--gc-shadow-glow);
+        background: rgba(34, 197, 94, 0.08);
     }
-
     .step-fragment {
         animation: step-enter 220ms ease;
     }
-
     textarea.textarea.is-agent-editor {
         min-height: 22rem;
-        font-family: "SFMono-Regular", "Menlo", monospace;
+        font-family: var(--gc-font-mono);
+        background: var(--gc-surface);
+        border-color: var(--gc-border);
+        color: var(--gc-text);
+        border-radius: var(--gc-radius-md);
     }
-
+    textarea.textarea.is-agent-editor:focus {
+        border-color: var(--gc-accent);
+        box-shadow: 0 0 0 3px var(--gc-accent-glow);
+    }
     .htmx-indicator {
         opacity: 0;
         transition: opacity 120ms ease;
     }
-
     .htmx-request .htmx-indicator,
     .htmx-request.htmx-indicator {
         opacity: 1;
     }
-
     @keyframes step-enter {
         from { opacity: 0; transform: translateY(8px); }
         to   { opacity: 1; transform: translateY(0); }
     }
-
     .sidebar-timeline .timeline-item::before {
-        background-color: rgba(255, 255, 255, 0.15);
+        background-color: rgba(255, 255, 255, 0.1);
     }
     .sidebar-timeline .timeline-item .timeline-marker {
-        background: rgba(255, 255, 255, 0.18) !important;
-        border-color: rgba(255, 255, 255, 0.3) !important;
+        background: rgba(255, 255, 255, 0.12) !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+        border-radius: 50% !important;
+    }
+    .sidebar-timeline .timeline-item.is-primary .timeline-marker {
+        background: var(--gc-accent) !important;
+        border-color: var(--gc-accent) !important;
+        box-shadow: 0 0 12px var(--gc-accent-glow);
     }
     .sidebar-timeline .timeline-item .timeline-marker.is-icon > * {
         color: rgba(255, 255, 255, 0.75) !important;
+    }
+    .sidebar-timeline .timeline-item.is-primary .timeline-marker.is-icon > * {
+        color: #fff !important;
     }
     div.sidebar-timeline .timeline-item {
         padding-bottom: 0.25em;
@@ -65,53 +118,161 @@
     div.sidebar-timeline .timeline-item .timeline-content {
         padding-top: 1.2em;
     }
+    .onboarding-sidebar .notification,
+    .onboarding-main .notification {
+        background: var(--gc-glass-bg);
+        border: 1px solid var(--gc-border);
+        border-radius: var(--gc-radius-md);
+        color: var(--gc-text);
+    }
+    .onboarding-sidebar .message.is-link .message-body,
+    .onboarding-main .message.is-link .message-body {
+        background: rgba(34, 197, 94, 0.08);
+        border-color: var(--gc-border-accent);
+        color: var(--gc-text);
+    }
+    .onboarding-sidebar .message.is-danger .message-body,
+    .onboarding-main .message.is-danger .message-body {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: rgba(239, 68, 68, 0.3);
+        color: #fca5a5;
+    }
+    .onboarding-main .input,
+    .onboarding-main .textarea,
+    .onboarding-main .select select {
+        background: var(--gc-surface);
+        border-color: var(--gc-border);
+        color: var(--gc-text);
+        border-radius: var(--gc-radius-sm);
+        font-family: var(--gc-font);
+    }
+    .onboarding-main .input:focus,
+    .onboarding-main .textarea:focus,
+    .onboarding-main .select select:focus {
+        border-color: var(--gc-accent);
+        box-shadow: 0 0 0 3px var(--gc-accent-glow);
+    }
+    .onboarding-main .input::placeholder,
+    .onboarding-main .textarea::placeholder {
+        color: var(--gc-text-dim);
+    }
+    .onboarding-main .label {
+        color: var(--gc-text-muted);
+        font-weight: 500;
+    }
+    .onboarding-main .help {
+        color: var(--gc-text-dim);
+    }
+    .onboarding-main .button.is-primary {
+        background: var(--gc-accent);
+        border-color: var(--gc-accent);
+        box-shadow: var(--gc-shadow-glow);
+        border-radius: var(--gc-radius-sm);
+        font-family: var(--gc-font);
+        font-weight: 600;
+        transition: transform var(--gc-transition), box-shadow var(--gc-transition);
+    }
+    .onboarding-main .button.is-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0 28px var(--gc-accent-glow);
+    }
+    .onboarding-main .button.is-light {
+        background: var(--gc-glass-bg);
+        border: 1px solid var(--gc-border);
+        color: var(--gc-text-muted);
+        border-radius: var(--gc-radius-sm);
+    }
+    .onboarding-main .button.is-light:hover {
+        background: rgba(255,255,255,.1);
+        border-color: var(--gc-border-accent);
+        color: var(--gc-text);
+    }
+    .onboarding-main .button.is-ghost {
+        color: var(--gc-text-dim);
+        border-radius: var(--gc-radius-sm);
+    }
+    .onboarding-main .button.is-ghost:hover {
+        color: var(--gc-text-muted);
+    }
+    .onboarding-main .button.is-info {
+        background: rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        color: #93c5fd;
+        border-radius: var(--gc-radius-sm);
+    }
+    .onboarding-main .button.is-info:hover {
+        background: rgba(59, 130, 246, 0.25);
+    }
+    .onboarding-main .button.is-danger.is-light {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+        color: #fca5a5;
+        border-radius: var(--gc-radius-sm);
+    }
+    .onboarding-main .tag.is-light {
+        background: var(--gc-glass-bg);
+        border: 1px solid var(--gc-border);
+        color: var(--gc-text-muted);
+    }
+    .onboarding-main .box {
+        background: var(--gc-glass-bg);
+        border: 1px solid var(--gc-border);
+        border-radius: var(--gc-radius-md);
+        box-shadow: var(--gc-shadow-sm);
+    }
+    @media (max-width: 768px) {
+        .onboarding-layout {
+            flex-direction: column;
+        }
+        .onboarding-sidebar {
+            flex: none;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<section class="section py-5">
-    <div class="container is-max-desktop">
-        <div class="columns is-variable is-6">
-            <div class="column is-5">
-                <aside class="box has-background-dark has-text-white">
-                    <div class="brand-lockup mb-5">
-                        <p class="is-size-7 has-text-primary has-text-weight-bold is-uppercase mb-1" style="letter-spacing: 0.1em">{{ t("onboarding.sidebar.setup") }}</p>
-                        <p class="brand-word mb-0"><span class="brand-agent">Java</span><span class="brand-runr">Claw</span></p>
-                    </div>
-                    <h1 class="title is-3 has-text-white mb-3">{{ t("onboarding.sidebar.title") }}</h1>
-                    <p class="has-text-grey-light mb-5">{{ t("onboarding.sidebar.desc") }}</p>
-                    <p class="is-size-7 has-text-grey mb-5 has-text-centered">{{ t("onboarding.sidebar.powered", ["Spring AI", "JobRunr"]) }}</p>
-
-                    <div class="timeline no-headers sidebar-timeline">
-                        {% for step in steps %}
-                        {% set stepNum = loop.index + 1 %}
-                        <div class="timeline-item {% if loop.first %}is-first{% endif %}{% if loop.last %} is-last{% endif %}{% if stepNum <= currentStepNumber %} is-primary{% endif %}">
-                            <div class="timeline-marker is-icon{% if stepNum <= currentStepNumber %} is-primary{% endif %}">
-                                <span>{{ stepNum }}</span>
-                            </div>
-                            <div class="timeline-content">
-                                <p class="is-size-6{% if stepNum == currentStepNumber %} has-text-white has-text-weight-semibold{% elseif stepNum < currentStepNumber %} has-text-grey-light{% else %} has-text-grey-light{% endif %}">
-                                    {{ step.title }}{% if step.optional %} <span class="is-size-7 has-text-grey ml-1">{{ t("onboarding.sidebar.optional") }}</span>{% endif %}
-                                </p>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-
-                    <div class="mt-5 has-text-centered">
-                        <div class="lang-switch" style="justify-content: center;">
-                            <a href="?lang=en" style="color: rgba(255,255,255,.5);" {% if locale.language == "en" %}class="is-active"{% endif %}>{{ t("lang.en") }}</a>
-                            <a href="?lang=zh" style="color: rgba(255,255,255,.5);" {% if locale.language == "zh" %}class="is-active"{% endif %}>{{ t("lang.zh") }}</a>
-                        </div>
-                    </div>
-                </aside>
-            </div>
-            <div class="column is-7">
-                <div class="box" data-theme="light">
-                    {% include stepTemplate %}
+<div class="onboarding-page">
+    <div class="onboarding-layout">
+        <div class="onboarding-sidebar">
+            <aside class="glass-card">
+                <div class="brand-lockup mb-5">
+                    <p class="is-size-7 has-text-weight-bold is-uppercase mb-1" style="letter-spacing: 0.1em; color: var(--gc-accent);">{{ t("onboarding.sidebar.setup") }}</p>
+                    <p class="brand-word mb-0"><span class="brand-agent">Game</span><span class="brand-runr">Claw</span></p>
                 </div>
+                <h1 class="title is-3 has-text-white mb-3">{{ t("onboarding.sidebar.title") }}</h1>
+                <p style="color: var(--gc-text-muted);" class="mb-5">{{ t("onboarding.sidebar.desc") }}</p>
+                <p class="is-size-7 has-text-centered mb-5" style="color: var(--gc-text-dim);">{{ t("onboarding.sidebar.powered", ["Spring AI", "JobRunr"]) }}</p>
+
+                <div class="timeline no-headers sidebar-timeline">
+                    {% for step in steps %}
+                    {% set stepNum = loop.index + 1 %}
+                    <div class="timeline-item {% if loop.first %}is-first{% endif %}{% if loop.last %} is-last{% endif %}{% if stepNum <= currentStepNumber %} is-primary{% endif %}">
+                        <div class="timeline-marker is-icon{% if stepNum <= currentStepNumber %} is-primary{% endif %}">
+                            <span>{{ stepNum }}</span>
+                        </div>
+                        <div class="timeline-content">
+                            <p class="is-size-6{% if stepNum == currentStepNumber %} has-text-white has-text-weight-semibold{% elseif stepNum < currentStepNumber %} has-text-grey-light{% else %} has-text-grey-light{% endif %}">
+                                {{ step.title }}{% if step.optional %} <span class="is-size-7 has-text-grey ml-1">{{ t("onboarding.sidebar.optional") }}</span>{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-5 has-text-centered">
+                    <div class="lang-switch" style="justify-content: center;">
+                        <a href="?lang=en" {% if locale.language == "en" %}class="is-active"{% endif %}>{{ t("lang.en") }}</a>
+                        <a href="?lang=zh" {% if locale.language == "zh" %}class="is-active"{% endif %}>{{ t("lang.zh") }}</a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+        <div class="onboarding-main">
+            <div class="glass-card">
+                {% include stepTemplate %}
             </div>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}

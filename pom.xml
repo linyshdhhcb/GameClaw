@@ -47,6 +47,10 @@
         <testcontainers.version>1.21.4</testcontainers.version>
         <resilience4j.version>2.4.0</resilience4j.version>
         <archunit.version>1.4.2</archunit.version>
+        <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
+        <spotbugs-maven-plugin.version>4.9.3.0</spotbugs-maven-plugin.version>
+        <spotbugs.version>4.9.3</spotbugs.version>
+        <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -178,6 +182,35 @@
                         <include>**/*Test.java</include>
                         <include>**/*Tests.java</include>
                     </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${spotbugs-maven-plugin.version}</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs</artifactId>
+                        <version>${spotbugs.version}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <effort>Low</effort>
+                    <threshold>High</threshold>
+                    <excludeFilterFile>${project.basedir}/../spotbugs-exclude.xml</excludeFilterFile>
+                    <jvmArgs>--enable-preview</jvmArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven-checkstyle-plugin.version}</version>
+                <configuration>
+                    <configLocation>${project.basedir}/../checkstyle.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failOnViolation>false</failOnViolation>
+                    <violationSeverity>warning</violationSeverity>
                 </configuration>
             </plugin>
         </plugins>

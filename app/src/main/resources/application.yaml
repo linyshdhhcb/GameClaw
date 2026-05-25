@@ -55,6 +55,19 @@ management:
   endpoint:
     restart:
       enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,info,metrics
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        llm_latency_seconds: true
+    export:
+      prometheus:
+        enabled: true
 
 pebble:
   suffix: .html.peb

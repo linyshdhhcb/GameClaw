@@ -25,13 +25,12 @@ GameClaw/
 ├── base/                    # 核心模块（18 个子包）
 ├── providers/               # LLM 供应商实现
 │   ├── anthropic/           # Anthropic Claude
-│   ├── openai/              # OpenAI GPT
+│   ├── openai/              # OpenAI + 18 家 OpenAI 兼容供应商
 │   ├── ollama/              # Ollama 本地模型
 │   ├── google/              # Google Gemini
 │   ├── deepseek/            # DeepSeek (V3/R1)
 │   ├── mistral/             # Mistral AI (Large/Codestral)
-│   ├── minimax/             # MiniMax (Text-01/abab)
-│   └── compat-openai/       # OpenAI 兼容供应商聚合（18 家）
+│   └── minimax/             # MiniMax (Text-01/abab)
 ├── plugins/                 # 渠道/工具插件
 │   ├── feishu/              # 飞书 Bot
 │   ├── telegram/            # Telegram Bot
@@ -75,16 +74,16 @@ GameClaw/
 | 模块 | 功能点 |
 |------|--------|
 | **anthropic** | AnthropicAgentOnboardingProvider (claude-sonnet-4-6)、Claude Code OAuth Token 自动发现 (macOS Keychain / Linux credentials)、自定义 Backend (Bearer Token + anthropic-beta) |
-| **openai** | OpenAIAgentOnboardingProvider (gpt-5.4) |
+| **openai** | OpenAIAgentOnboardingProvider (gpt-5.4) + 18 家 OpenAI 兼容供应商，基于 `OpenAICompatibleProvider` 抽象基类，统一复用 `spring-ai-starter-model-openai` + 自定义 `base-url` |
 | **ollama** | OllamaAgentOnboardingProvider (qwen3.5:27b, 无需 API Key) |
 | **google** | GoogleGenAIAgentOnboardingProvider (gemini-3-flash-preview) |
 | **deepseek** | DeepSeekAgentOnboardingProvider (deepseek-chat)、DeepSeek-V3 通用对话 / DeepSeek-R1 深度推理 |
 | **mistral** | MistralAgentOnboardingProvider (mistral-large-latest)、Mistral Large 通用对话 / Codestral 代码生成 |
 | **minimax** | MiniMaxAgentOnboardingProvider (MiniMax-Text-01)、中文对话 / 长上下文理解 |
 
-### OpenAI 兼容供应商模块 (compat-openai)
+### OpenAI 兼容供应商 (providers/openai)
 
-基于 `OpenAICompatibleProvider` 抽象基类，统一复用 `spring-ai-starter-model-openai` + 自定义 `base-url`，所有供应商共享 OpenAI 协议的参数标准化与错误处理。
+基于 `OpenAICompatibleProvider` 抽象基类，统一复用 `spring-ai-starter-model-openai` + 自定义 `base-url`，原生 OpenAI 与 18 家兼容供应商共享 OpenAI 协议的参数标准化与错误处理。
 
 | 供应商 | 默认模型 | API 端点 | 推荐场景 |
 |--------|----------|----------|----------|

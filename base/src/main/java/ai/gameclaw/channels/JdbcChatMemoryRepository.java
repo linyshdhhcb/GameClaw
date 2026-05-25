@@ -56,10 +56,8 @@ public class JdbcChatMemoryRepository implements AppendableChatMemoryRepository 
     @Override
     @Transactional(readOnly = true)
     public List<Message> findByConversationId(String conversationId) {
-        UUID convUuid;
-        try {
-            convUuid = UUID.fromString(conversationId);
-        } catch (IllegalArgumentException e) {
+        UUID convUuid = tryParseUuid(conversationId);
+        if (convUuid == null) {
             return List.of();
         }
         List<ConversationMessage> messages = conversationRepository.findMessagesByConversationId(convUuid);
@@ -74,6 +72,7 @@ public class JdbcChatMemoryRepository implements AppendableChatMemoryRepository 
     @Transactional
     public void appendAll(String conversationId, List<Message> messages) {
         UUID convUuid = resolveConversationUuid(conversationId);
+        if (convUuid == null) return;
         TenantContext ctx = TenantContextHolder.tryGet().orElse(null);
         UUID tenantId = ctx != null ? ctx.tenantId() : null;
         for (Message msg : messages) {
@@ -86,6 +85,7 @@ public class JdbcChatMemoryRepository implements AppendableChatMemoryRepository 
     @Transactional
     public void saveAll(String conversationId, List<Message> messages) {
         UUID convUuid = resolveConversationUuid(conversationId);
+        if (convUuid == null) return;
         TenantContext ctx = TenantContextHolder.tryGet().orElse(null);
         UUID tenantId = ctx != null ? ctx.tenantId() : null;
         conversationRepository.deleteMessagesByConversationId(convUuid);
@@ -98,25 +98,24 @@ public class JdbcChatMemoryRepository implements AppendableChatMemoryRepository 
     @Override
     @Transactional
     public void deleteByConversationId(String conversationId) {
-        UUID convUuid;
-        try {
-            convUuid = UUID.fromString(conversationId);
-        } catch (IllegalArgumentException e) {
-            return;
-        }
+        UUID convUuid = tryParseUuid(conversationId);
+        if (convUuid == null) return;
         conversationService.deleteConversation(convUuid);
     }
 
-    private UUID resolveConversationUuid(String conversationId) {
+    private UUID tryParseUuid(String conversationId) {
         try {
             return UUID.fromString(conversationId);
         } catch (IllegalArgumentException e) {
-            Conversation conv = conversationService.getOrCreate(conversationId);
-            if (conv == null) {
-                throw new IllegalStateException("Cannot resolve conversation: " + conversationId);
-            }
-            return conv.id();
+            return null;
         }
+    }
+
+    private UUID resolveConversationUuid(String conversationId) {
+        UUID uuid = tryParseUuid(conversationId);
+        if (uuid != null) return uuid;
+        Conversation conv = conversationService.getOrCreate(conversationId);
+        return conv != null ? conv.id() : null;
     }
 
     private Message toSpringAiMessage(ConversationMessage msg) {

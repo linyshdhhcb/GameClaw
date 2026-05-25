@@ -24,6 +24,7 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.ai.model.SpringAIModelProperties;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -75,7 +76,8 @@ public class GameClawConfiguration {
                                  TaskManager taskManager,
                                  ConfigurationManager configurationManager,
                                  @Value("${agent.workspace:Unknown}") Resource workspace,
-                                 Set<AutoDiscoveredTool<?>> autoDiscoveredTools
+                                 Set<AutoDiscoveredTool<?>> autoDiscoveredTools,
+                                 ObjectProvider<ChatModel> chatModelProvider
     ) throws IOException {
 
         Resource agentMd = workspace.createRelative(AGENT_MD);
@@ -85,9 +87,12 @@ public class GameClawConfiguration {
         String agentPrompt = agentMd.getContentAsString(StandardCharsets.UTF_8) + System.lineSeparator()
                 + workspace.createRelative("INFO.md").getContentAsString(StandardCharsets.UTF_8) + System.lineSeparator();
 
-        ToolCallAdvisor toolCallAdvisor = toolSearchToolCallAdvisorProvider.getIfAvailable();
-        if (toolCallAdvisor == null) {
-            toolCallAdvisor = ToolCallAdvisor.builder().build();
+        ChatModel chatModel = chatModelProvider.getIfUnique();
+        boolean hasToolCallingOptions = chatModel != null
+                && chatModel.getDefaultOptions() instanceof ToolCallingChatOptions;
+
+        if (hasToolCallingOptions) {
+            chatClientBuilder.defaultOptions(chatModel.getDefaultOptions().mutate());
         }
 
         chatClientBuilder
@@ -99,16 +104,23 @@ public class GameClawConfiguration {
                         TaskTool.builder().taskManager(taskManager).build(),
                         CheckListTool.builder().build(),
                         McpTool.builder().configurationManager(configurationManager).build(),
-                        //Bash execution tool
-                        //ShellTools.builder().build(),// built-in shell tools
-                        // Read, Write and Edit files tool
-                        FileSystemTools.builder().build(),// built-in file system tools
-                        // Smart web fetch tool
-                        SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build())
-                .defaultAdvisors(
-                        toolCallAdvisor,
-                        MessageChatMemoryAdvisor.builder(chatMemory).build()
-                );
+                        FileSystemTools.builder().build(),
+                        SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build());
+
+        if (hasToolCallingOptions) {
+            ToolCallAdvisor toolCallAdvisor = toolSearchToolCallAdvisorProvider.getIfAvailable();
+            if (toolCallAdvisor == null) {
+                toolCallAdvisor = ToolCallAdvisor.builder().build();
+            }
+            chatClientBuilder.defaultAdvisors(
+                    toolCallAdvisor,
+                    MessageChatMemoryAdvisor.builder(chatMemory).build()
+            );
+        } else {
+            chatClientBuilder.defaultAdvisors(
+                    MessageChatMemoryAdvisor.builder(chatMemory).build()
+            );
+        }
 
         autoDiscoveredTools.forEach(autoDiscoveredTool -> chatClientBuilder.defaultTools(autoDiscoveredTool.tool()));
         return chatClientBuilder.build();

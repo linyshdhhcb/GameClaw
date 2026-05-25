@@ -37,7 +37,7 @@ public class WebChatSseController {
         TenantContext ctx = TenantContextHolder.tryGet().orElse(null);
 
         String effectiveConvId = conversationId;
-        if (ctx != null) {
+        if (ctx != null && ctx.tenantId() != null && ctx.userId() != null) {
             Conversation conv = conversationService.getOrCreate("web");
             if (conv != null) {
                 effectiveConvId = conv.id().toString();

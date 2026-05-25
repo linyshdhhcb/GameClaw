@@ -24,6 +24,10 @@
         <module>providers/openai</module>
         <module>providers/ollama</module>
         <module>providers/google</module>
+        <module>providers/deepseek</module>
+        <module>providers/mistral</module>
+        <module>providers/minimax</module>
+        <module>providers/compat-openai</module>
         <module>plugins/brave</module>
         <module>plugins/discord</module>
         <module>plugins/playwright</module>
@@ -103,6 +107,26 @@
             <dependency>
                 <groupId>ai.gameclaw</groupId>
                 <artifactId>gameclaw-provider-google</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.gameclaw</groupId>
+                <artifactId>gameclaw-provider-deepseek</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.gameclaw</groupId>
+                <artifactId>gameclaw-provider-mistral</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.gameclaw</groupId>
+                <artifactId>gameclaw-provider-minimax</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.gameclaw</groupId>
+                <artifactId>gameclaw-provider-compat-openai</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

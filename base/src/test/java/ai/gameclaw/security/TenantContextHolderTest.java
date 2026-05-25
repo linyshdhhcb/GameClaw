@@ -70,11 +70,11 @@ class TenantContextHolderTest {
     void tenantContextWithProjectAndUser() {
         UUID projectId = UUID.randomUUID();
         UUID userId = UUID.randomUUID();
-        TenantContext ctx = TenantContext.of(TENANT_A, projectId, userId, Set.of(TenantContext.Role.ADMIN));
+        TenantContext ctx = TenantContext.of(TENANT_A, projectId, userId, Set.of(Role.ADMIN));
         assertThat(ctx.tenantId()).isEqualTo(TENANT_A);
         assertThat(ctx.projectId()).isEqualTo(projectId);
         assertThat(ctx.userId()).isEqualTo(userId);
-        assertThat(ctx.roles()).containsExactly(TenantContext.Role.ADMIN);
+        assertThat(ctx.roles()).containsExactly(Role.ADMIN);
     }
 
     @Test

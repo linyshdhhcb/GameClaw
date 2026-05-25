@@ -10,16 +10,12 @@ public record TenantContext(
         Set<Role> roles
 ) {
 
-    public enum Role {
-        ADMIN, MEMBER, VIEWER
-    }
-
     public static TenantContext of(UUID tenantId) {
-        return new TenantContext(tenantId, null, null, Set.of(Role.MEMBER));
+        return new TenantContext(tenantId, null, null, Set.of(Role.PROGRAMMER));
     }
 
     public static TenantContext of(UUID tenantId, UUID projectId) {
-        return new TenantContext(tenantId, projectId, null, Set.of(Role.MEMBER));
+        return new TenantContext(tenantId, projectId, null, Set.of(Role.PROGRAMMER));
     }
 
     public static TenantContext of(UUID tenantId, UUID projectId, UUID userId, Set<Role> roles) {

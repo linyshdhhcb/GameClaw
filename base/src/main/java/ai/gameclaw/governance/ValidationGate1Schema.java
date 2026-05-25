@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Order(1)
+@ConditionalOnBean(ObjectMapper.class)
 public class ValidationGate1Schema implements ValidationGate {
 
     private static final Logger log = LoggerFactory.getLogger(ValidationGate1Schema.class);

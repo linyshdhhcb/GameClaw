@@ -31,11 +31,10 @@ public class JdbcChatMemoryRepository implements AppendableChatMemoryRepository 
     private final ObjectMapper objectMapper;
 
     public JdbcChatMemoryRepository(ConversationRepository conversationRepository,
-                                    ConversationService conversationService,
-                                    ObjectMapper objectMapper) {
+                                    ConversationService conversationService) {
         this.conversationRepository = conversationRepository;
         this.conversationService = conversationService;
-        this.objectMapper = objectMapper;
+        this.objectMapper = new ObjectMapper();
     }
 
     @Override

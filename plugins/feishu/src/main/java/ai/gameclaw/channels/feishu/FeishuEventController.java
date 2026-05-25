@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Instant;
-import java.util.Map;
 
 @RestController
+@ConditionalOnProperty(prefix = "agent.channels.feishu", name = {"app-id", "app-secret"})
 public class FeishuEventController {
 
     private static final Logger log = LoggerFactory.getLogger(FeishuEventController.class);
@@ -24,8 +26,10 @@ public class FeishuEventController {
     private final NonceCache nonceCache;
     private final FeishuChannel feishuChannel;
 
-    public FeishuEventController(String verificationToken, String encryptKey,
-                                 NonceCache nonceCache, FeishuChannel feishuChannel) {
+    public FeishuEventController(
+            @Value("${agent.channels.feishu.verification-token:}") String verificationToken,
+            @Value("${agent.channels.feishu.encrypt-key:}") String encryptKey,
+            NonceCache nonceCache, FeishuChannel feishuChannel) {
         this.verificationToken = verificationToken;
         this.encryptKey = encryptKey;
         this.nonceCache = nonceCache;

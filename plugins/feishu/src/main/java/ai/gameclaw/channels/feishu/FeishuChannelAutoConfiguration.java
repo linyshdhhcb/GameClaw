@@ -48,15 +48,6 @@ public class FeishuChannelAutoConfiguration {
     }
 
     @Bean
-    public FeishuEventController feishuEventController(
-            @org.springframework.beans.factory.annotation.Value("${agent.channels.feishu.verification-token:}") String verificationToken,
-            @org.springframework.beans.factory.annotation.Value("${agent.channels.feishu.encrypt-key:}") String encryptKey,
-            NonceCache nonceCache,
-            FeishuChannel feishuChannel) {
-        return new FeishuEventController(verificationToken, encryptKey, nonceCache, feishuChannel);
-    }
-
-    @Bean
     public FeishuOnboardingProvider feishuOnboardingProvider() {
         return new FeishuOnboardingProvider();
     }

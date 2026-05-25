@@ -149,6 +149,50 @@
 .chat-readonly-notice strong {
     color: rgba(180, 195, 235, .7);
 }
+
+#role-selector {
+    background: hsl(229, 20%, 12%);
+    border-color: rgba(255, 255, 255, .1);
+    color: #d8dde8;
+    border-radius: .5rem;
+    font-size: .8rem;
+    padding: .25rem .5rem;
+    cursor: pointer;
+}
+#role-selector:focus {
+    border-color: var(--bulma-primary);
+    outline: none;
+}
+
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .2rem .6rem;
+    border-radius: .5rem;
+    font-size: .75rem;
+    background: hsl(229, 20%, 15%);
+    border: 1px solid rgba(255, 255, 255, .08);
+    color: rgba(200, 206, 224, .8);
+}
+.role-badge--active {
+    background: color-mix(in srgb, var(--bulma-primary) 20%, transparent);
+    border-color: color-mix(in srgb, var(--bulma-primary) 40%, transparent);
+    color: var(--bulma-primary);
+}
+
+#tool-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .3rem;
+    padding: .3rem 0;
+}
+#tool-list .tag {
+    font-size: .7rem;
+    background: hsl(229, 20%, 15%);
+    color: rgba(200, 206, 224, .6);
+    border: 1px solid rgba(255, 255, 255, .05);
+}
 </style>
 {% endblock %}
 
@@ -168,6 +212,11 @@
                 <div class="select is-small is-dark" id="channel-selector"></div>
             </div>
             <div class="navbar-item">
+                <select id="role-selector" title="Select Role">
+                    <option value="PROGRAMMER">游戏程序员</option>
+                </select>
+            </div>
+            <div class="navbar-item">
                 <a href="/onboarding" class="button is-small is-dark">
                     <span>Settings</span>
                 </a>
@@ -185,6 +234,7 @@
 
     <div class="chat-body">
         <div class="container">
+            <div id="tool-list"></div>
             <div id="chat-messages">
             </div>
             <div id="typing-indicator"></div>
@@ -194,7 +244,7 @@
     <div class="chat-footer">
         <div class="container" id="chat-input-area">
             <form id="chat-form" ws-send hx-boost="false"
-                  hx-vals='js:{"type": "userMessage", "conversationId": document.getElementById("channel-select") ? document.getElementById("channel-select").value : "web"}'>
+                  hx-vals='js:{"type": "userMessage", "conversationId": document.getElementById("channel-select") ? document.getElementById("channel-select").value : "web", "role": document.getElementById("role-selector") ? document.getElementById("role-selector").value : "PROGRAMMER"}'>
                 <div class="field is-grouped" style="align-items: flex-end; margin: 0;">
                     <div class="control is-expanded">
                         <textarea id="message-input" class="textarea" name="message" rows="1"
@@ -223,11 +273,56 @@
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/htmx-ext-ws@2.0.2/ws.js"></script>
 <script>
-// htmx handles: WebSocket connect/send, OOB DOM swaps, auto-scroll (show:bottom),
-// form reset (hx-on:htmx:wsAfterSend), and Enter-to-send (hx-trigger on textarea).
-// JS handles only what htmx cannot: updating two separate DOM nodes from one WS event.
 (function () {
-    const statusTag  = document.getElementById('status-tag');
+    var statusTag = document.getElementById('status-tag');
+    var roleSelector = document.getElementById('role-selector');
+    var toolList = document.getElementById('tool-list');
+
+    var roleTools = {
+        PLATFORM_ADMIN: ['Read', 'Sandbox Write', 'Project Write', 'DB Write', 'Production'],
+        ADMIN: ['Read', 'Sandbox Write', 'Project Write', 'DB Write'],
+        PROGRAMMER: ['Read', 'Sandbox Write', 'Project Write'],
+        DEVOPS: ['Read', 'Sandbox Write', 'Project Write'],
+        PROJECT_MANAGER: ['Read', 'Sandbox Write', 'Project Write'],
+        QA: ['Read', 'Sandbox Write'],
+        DATA_ANALYST: ['Read', 'Sandbox Write'],
+        PLANNER: ['Read', 'Sandbox Write'],
+        OPERATIONS: ['Read', 'Sandbox Write'],
+        TA: ['Read']
+    };
+
+    function updateToolList(role) {
+        if (!toolList) return;
+        var tools = roleTools[role] || ['Read'];
+        toolList.innerHTML = tools.map(function(t) {
+            return '<span class="tag">' + t + '</span>';
+        }).join('');
+    }
+
+    function loadRoles() {
+        fetch('/api/roles').then(function(r) { return r.json(); }).then(function(roles) {
+            if (!roleSelector) return;
+            roleSelector.innerHTML = '';
+            roles.forEach(function(r) {
+                var opt = document.createElement('option');
+                opt.value = r.name;
+                opt.textContent = r.description;
+                if (r.active === 'true') opt.selected = true;
+                roleSelector.appendChild(opt);
+            });
+            updateToolList(roleSelector.value);
+        }).catch(function() {
+            updateToolList('PROGRAMMER');
+        });
+    }
+
+    if (roleSelector) {
+        roleSelector.addEventListener('change', function() {
+            updateToolList(roleSelector.value);
+        });
+    }
+
+    loadRoles();
 
     document.body.addEventListener('htmx:wsOpen', function () {
         statusTag.className = 'tag is-success is-light is-rounded';

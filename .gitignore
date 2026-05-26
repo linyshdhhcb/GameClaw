@@ -47,6 +47,7 @@ workspace/
 !workspace/AGENT.md
 !workspace/openclaw.json
 !workspace/skills/skill-creator/
+!workspace/game-skills/
 *.private*
 *.h2.db
 *.lock.db

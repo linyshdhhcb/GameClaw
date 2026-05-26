@@ -68,7 +68,7 @@ class GameCodeToolTest {
                 ]}
                 """);
 
-        detector = new ApiHallucinationDetector(new FileSystemResource(workspace.toFile()));
+        detector = new ApiHallucinationDetector(new FileSystemResource(workspace.toFile()), null);
         sandboxWriter = new SandboxWriter(new FileSystemResource(workspace.toFile()));
         tool = new GameCodeTool(llmClient, sandboxWriter, detector);
     }

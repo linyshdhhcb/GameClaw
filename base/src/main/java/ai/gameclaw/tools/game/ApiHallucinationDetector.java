@@ -2,9 +2,12 @@ package ai.gameclaw.tools.game;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
@@ -40,9 +43,12 @@ public class ApiHallucinationDetector {
     private final Map<Engine, Set<String>> apiIndex = new ConcurrentHashMap<>();
     private final Map<Engine, List<ApiEntry>> apiEntries = new ConcurrentHashMap<>();
     private final Path skillsDir;
+    private final MeterRegistry meterRegistry;
 
-    public ApiHallucinationDetector(@Value("${agent.workspace:}") Resource workspace) throws IOException {
+    public ApiHallucinationDetector(@Value("${agent.workspace:}") Resource workspace,
+                                     @Autowired(required = false) MeterRegistry meterRegistry) throws IOException {
         this.skillsDir = workspace.getFilePath().resolve("game-skills");
+        this.meterRegistry = meterRegistry;
         Files.createDirectories(skillsDir);
         loadAllIndexes();
     }
@@ -60,6 +66,12 @@ public class ApiHallucinationDetector {
 
         if (!unknown.isEmpty()) {
             log.warn("[HallucinationDetector] Engine={}, unknown APIs: {}", engine, unknown);
+            if (meterRegistry != null) {
+                Counter.builder("hallucination_count")
+                        .tag("engine", engine.name())
+                        .register(meterRegistry)
+                        .increment(unknown.size());
+            }
         }
 
         return new DetectionResult(unknown, usedApis.size());

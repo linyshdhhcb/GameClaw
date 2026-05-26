@@ -44,7 +44,7 @@ class ApiHallucinationDetectorTest {
                 """);
 
         detector = new ApiHallucinationDetector(
-                new org.springframework.core.io.FileSystemResource(workspace.toFile()));
+                new org.springframework.core.io.FileSystemResource(workspace.toFile()), null);
     }
 
     @Test

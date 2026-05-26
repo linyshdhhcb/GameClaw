@@ -51,6 +51,7 @@
         <commonmark.version>0.28.0</commonmark.version>
         <testcontainers.version>1.21.4</testcontainers.version>
         <resilience4j.version>2.4.0</resilience4j.version>
+        <picocli.version>4.7.6</picocli.version>
         <archunit.version>1.4.2</archunit.version>
         <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
         <spotbugs-maven-plugin.version>4.9.3.0</spotbugs-maven-plugin.version>

@@ -35,6 +35,9 @@ class GameDataToolTest {
     @Mock(lenient = true)
     ObjectProvider<AiMetrics> aiMetricsProvider;
 
+    @Mock(lenient = true)
+    ObjectProvider<List<io.modelcontextprotocol.client.McpSyncClient>> mcpClientsProvider;
+
     List<ValidationGate> gates = List.of();
 
     private String runWithTenant(GameDataTool tool, String question, String table) {
@@ -50,7 +53,8 @@ class GameDataToolTest {
 
     private GameDataTool createTool() {
         when(aiMetricsProvider.getIfAvailable()).thenReturn(null);
-        return new GameDataTool(llmClient, new SqlSafetyValidator(), gates, aiMetricsProvider);
+        when(mcpClientsProvider.getIfAvailable()).thenReturn(null);
+        return new GameDataTool(llmClient, new SqlSafetyValidator(), gates, aiMetricsProvider, mcpClientsProvider);
     }
 
     @Test

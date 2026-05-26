@@ -10,8 +10,19 @@ spring:
         name: clickhouse-mcp-server
         version: 1.0.0
 
+mcp:
+  security:
+    bearer:
+      enabled: false
+      token: "${MCP_BEARER_TOKEN:}"
+    mtls:
+      enabled: false
+      ca-cert: "${MCP_CA_CERT:classpath:certs/internal-ca.pem}"
+      client-cert: "${MCP_CLIENT_CERT:}"
+      client-key: "${MCP_CLIENT_KEY:}"
+
 clickhouse:
   url: jdbc:clickhouse://localhost:8123/default
   username: mcp_data_warehouse
-  password: ""
+  password: "${CLICKHOUSE_PASSWORD:}"
   database: default

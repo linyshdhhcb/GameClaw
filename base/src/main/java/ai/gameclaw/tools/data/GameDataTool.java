@@ -16,6 +16,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import io.modelcontextprotocol.client.McpSyncClient;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
@@ -58,16 +60,19 @@ public class GameDataTool {
     private final SqlSafetyValidator sqlValidator;
     private final List<ValidationGate> gates;
     private final ObjectProvider<AiMetrics> aiMetricsProvider;
+    private final ObjectProvider<List<McpSyncClient>> mcpClientsProvider;
     private final Cache<String, List<Map<String, Object>>> queryCache;
 
     public GameDataTool(@Lazy LlmClient llmClient,
                         SqlSafetyValidator sqlValidator,
                         List<ValidationGate> gates,
-                        ObjectProvider<AiMetrics> aiMetricsProvider) {
+                        ObjectProvider<AiMetrics> aiMetricsProvider,
+                        ObjectProvider<List<McpSyncClient>> mcpClientsProvider) {
         this.llmClient = llmClient;
         this.sqlValidator = sqlValidator;
         this.gates = gates;
         this.aiMetricsProvider = aiMetricsProvider;
+        this.mcpClientsProvider = mcpClientsProvider;
         this.queryCache = Caffeine.newBuilder()
                 .maximumSize(500)
                 .expireAfterWrite(Duration.ofMinutes(5))
@@ -129,7 +134,37 @@ public class GameDataTool {
 
     private List<Map<String, Object>> executeViaMcp(String sql) {
         log.info("[GameDataTool] Executing SQL via MCP: {}", sql);
-        return List.of(Map.of("info", "MCP execute_query result placeholder", "sql", sql));
+        var mcpClients = mcpClientsProvider.getIfAvailable();
+        if (mcpClients != null && !mcpClients.isEmpty()) {
+            for (McpSyncClient client : mcpClients) {
+                try {
+                    var result = client.callTool(new McpSchema.CallToolRequest("execute_query",
+                            Map.of("sql", sql)));
+                    if (result != null && !result.content().isEmpty()) {
+                        StringBuilder content = new StringBuilder();
+                        for (var item : result.content()) {
+                            if (item instanceof McpSchema.TextContent text) {
+                                content.append(text.text());
+                            }
+                        }
+                        String text = content.toString().trim();
+                        if (!text.isEmpty()) {
+                            try {
+                                return MAPPER.readValue(text, new TypeReference<List<Map<String, Object>>>() {});
+                            } catch (Exception e) {
+                                log.warn("[GameDataTool] Failed to parse MCP result as JSON, returning raw text");
+                                return List.of(Map.of("result", (Object) text));
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    log.warn("[GameDataTool] MCP call failed for client {}: {}", client.getClientInfo(), e.getMessage());
+                }
+            }
+        }
+        log.warn("[GameDataTool] MCP client not available, returning placeholder result");
+        return List.of(Map.of("info", (Object) "MCP client not connected. Configure spring.ai.mcp.client in application.yaml.",
+                "sql", sql));
     }
 
     private String formatResult(String sql, List<Map<String, Object>> rows, boolean cacheHit) {

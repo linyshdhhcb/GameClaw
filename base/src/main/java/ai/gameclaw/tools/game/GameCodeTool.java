@@ -6,6 +6,7 @@ import ai.gameclaw.security.RequireRiskLevel;
 import ai.gameclaw.security.RiskLevel;
 import ai.gameclaw.security.TenantContext;
 import ai.gameclaw.security.TenantContextHolder;
+import ai.gameclaw.tools.GameTool;
 import ai.gameclaw.tools.sandbox.SandboxWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 @Component
+@GameTool
 public class GameCodeTool {
 
     private static final Logger log = LoggerFactory.getLogger(GameCodeTool.class);

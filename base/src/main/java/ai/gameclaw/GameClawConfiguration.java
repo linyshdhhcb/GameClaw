@@ -26,6 +26,7 @@ import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.ai.model.SpringAIModelProperties;
 import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -75,6 +76,7 @@ public class GameClawConfiguration {
                                  SyncMcpToolCallbackProvider mcpToolProvider,
                                  TaskManager taskManager,
                                  ConfigurationManager configurationManager,
+                                 @Qualifier("gameTool") List<Object> gameToolBeans,
                                  @Value("${agent.workspace:Unknown}") Resource workspace,
                                  Set<AutoDiscoveredTool<?>> autoDiscoveredTools,
                                  ObjectProvider<ChatModel> chatModelProvider
@@ -106,6 +108,8 @@ public class GameClawConfiguration {
                         McpTool.builder().configurationManager(configurationManager).build(),
                         FileSystemTools.builder().build(),
                         SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build());
+
+        gameToolBeans.forEach(chatClientBuilder::defaultTools);
 
         if (hasToolCallingOptions) {
             ToolCallAdvisor toolCallAdvisor = toolSearchToolCallAdvisorProvider.getIfAvailable();

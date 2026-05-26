@@ -9,6 +9,7 @@ import ai.gameclaw.security.RequireRiskLevel;
 import ai.gameclaw.security.RiskLevel;
 import ai.gameclaw.security.TenantContext;
 import ai.gameclaw.security.TenantContextHolder;
+import ai.gameclaw.tools.GameTool;
 import ai.gameclaw.tools.game.model.GrowthCurvePoint;
 import ai.gameclaw.tools.game.model.ItemConfig;
 import ai.gameclaw.tools.game.model.MonsterConfig;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@GameTool
 public class GameDesignTool {
 
     private static final Logger log = LoggerFactory.getLogger(GameDesignTool.class);

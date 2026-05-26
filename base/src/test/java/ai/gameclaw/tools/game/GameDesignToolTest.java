@@ -36,7 +36,7 @@ class GameDesignToolTest {
     @Mock
     AiMetrics aiMetrics;
 
-    @Mock
+    @Mock(lenient = true)
     ObjectProvider<AiMetrics> aiMetricsProvider;
 
     List<ValidationGate> gates = List.of();

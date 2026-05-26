@@ -61,11 +61,12 @@ GameClaw/
 | **persistence** | TenantAwareDataSourceConfig 多租户数据源、TenantSettingsAspect RLS 会话变量注入、TenantAwareRepository 租户感知仓储 |
 | **project** | Project 实体、ProjectManager 项目管理接口 |
 | **providers** | AgentProvider 供应商聚合器、getDefaultChatModel 默认模型获取 |
-| **security** | TenantContext + TenantContextHolder (ScopedValue)、RBAC 5 级风险 × 10 种角色、@RequireRole/@RequireRiskLevel 注解 + AOP、DefaultRbacService (DB + Caffeine 双缓存 + fallback 矩阵)、PromptSanitizer 7 种注入检测、OutboundUrlFilter 出站白名单、PiiMasking PII 脱敏、SingleTenantFallback 单租户回退 |
+| **security** | TenantContext + TenantContextHolder (ScopedValue)、RBAC 5 级风险 × 10 种角色、@RequireRole/@RequireRiskLevel 注解 + AOP、DefaultRbacService (DB + Caffeine 双缓存 + fallback 矩阵)、PromptSanitizer 7 种注入检测、OutboundUrlFilter 出站白名单、PiiMasking PII 脱敏、PiiFieldRegistry 字段分类 (5 类)、PiiMaskingPostProcessor 角色化解密 (ADMIN/DATA_ANALYST 全可见)、SingleTenantFallback 单租户回退 |
 | **skills** | GameClawSkillParser SKILL.md 解析、GameClawSkillsLoader 四级优先级加载 (classpath → ~/.openclaw → ~/.gameclaw → workspace)、Caffeine LRU 缓存 |
 | **tasks** | Task/RecurringTask 实体、TaskManager (JobRunr 调度)、TaskHandler Agent 执行、FileSystemTaskRepository YAML 文件存储 |
-| **tools** | TaskTool 任务工具、CheckListTool 清单工具、McpTool MCP 服务器管理、AgentEnvironment 运行环境信息、Lucene 动态工具发现 |
+| **tools** | TaskTool 任务工具、CheckListTool 清单工具、McpTool MCP 服务器管理、@GameTool 工具注册注解、AgentEnvironment 运行环境信息、Lucene 动态工具发现 |
 | **tools/game** | GameDesignTool 策划配置生成 (怪物/技能/道具/任务/成长曲线)、GameCodeTool 代码生成 (Unity/Unreal/Godot)、ApiHallucinationDetector API 幻觉检测 + 引擎 API 查询、Engine 枚举 (UNITY/UNREAL/GODOT) |
+| **tools/data** | GameDataTool NL→SQL 数据查询 (仅 SELECT)、SqlSafetyValidator JSqlParser 双层校验、Caffeine L1 查询缓存 (5min TTL) |
 | **tools/sandbox** | SandboxWriter 租户隔离沙箱写入 (防 path traversal)、workspace/output/ 输出隔离 |
 | **compat** | ConfigPathMapper OpenClaw → GameClaw 配置键映射 |
 
@@ -116,6 +117,12 @@ GameClaw/
 | **brave** | Brave Web Search 自动配置 (ConditionalOnProperty) |
 | **playwright** | PlaywrightBrowserTool 浏览器自动化 (导航/点击/填表/提取/截图/JS执行) |
 
+### MCP Server 模块 (mcp-servers/java)
+
+| 模块 | 功能点 |
+|------|--------|
+| **clickhouse-mcp-server** | ClickHouseTools (list_tables/describe_table/execute_query)、SqlSafetyValidator JSqlParser SELECT-only 校验、只读账号 mcp_data_warehouse、ClickHouseProperties 连接配置 |
+
 ### 引擎 API 索引 (workspace/game-skills)
 
 | 引擎 | API 数量 | 说明 |
@@ -154,6 +161,7 @@ GameClaw/
 | 生成 Unreal 代码 | `generate_unreal_script` | 同上，C++ |
 | 生成 Godot 脚本 | `generate_godot_script` | 同上，GDScript |
 | 查询引擎 API | `query_engine_api` | 自然语言查 API（如"Unity 如何加载场景"→ SceneManager.LoadScene） |
+| 自然语言查数据 | `query_data` | 输入问题 → LLM 生成 SQL → 双层校验 → 执行 → PII 脱敏返回 |
 | 任务创建/调度 | `TaskTool` | 创建一次性/定时/周期任务 |
 | 清单管理 | `CheckListTool` | 创建结构化清单 |
 | MCP 服务器注册 | `McpTool` | 运行时添加 MCP 服务器 |

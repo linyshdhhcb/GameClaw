@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -59,7 +60,7 @@ public class GameDataTool {
     private final ObjectProvider<AiMetrics> aiMetricsProvider;
     private final Cache<String, List<Map<String, Object>>> queryCache;
 
-    public GameDataTool(LlmClient llmClient,
+    public GameDataTool(@Lazy LlmClient llmClient,
                         SqlSafetyValidator sqlValidator,
                         List<ValidationGate> gates,
                         ObjectProvider<AiMetrics> aiMetricsProvider) {

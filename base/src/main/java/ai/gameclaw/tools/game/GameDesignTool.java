@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
@@ -41,7 +42,7 @@ public class GameDesignTool {
     private final List<ValidationGate> gates;
     private final ObjectProvider<AiMetrics> aiMetricsProvider;
 
-    public GameDesignTool(LlmClient llmClient, SandboxWriter sandboxWriter,
+    public GameDesignTool(@Lazy LlmClient llmClient, SandboxWriter sandboxWriter,
                           List<ValidationGate> gates,
                           ObjectProvider<AiMetrics> aiMetricsProvider) {
         this.llmClient = llmClient;

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Path;
@@ -27,7 +28,7 @@ public class GameCodeTool {
     private final SandboxWriter sandboxWriter;
     private final ApiHallucinationDetector hallucinationDetector;
 
-    public GameCodeTool(LlmClient llmClient, SandboxWriter sandboxWriter,
+    public GameCodeTool(@Lazy LlmClient llmClient, SandboxWriter sandboxWriter,
                         ApiHallucinationDetector hallucinationDetector) {
         this.llmClient = llmClient;
         this.sandboxWriter = sandboxWriter;

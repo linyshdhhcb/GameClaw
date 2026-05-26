@@ -1,0 +1,20 @@
+name: "custom-hp-range"
+description: "HP must be between 10 and 500000"
+field: "hp"
+min: 10
+max: 500000
+appliesTo: "MonsterConfig"
+---
+name: "custom-attack-range"
+description: "Attack must be between 10 and 50000"
+field: "attack"
+min: 10
+max: 50000
+appliesTo: "MonsterConfig"
+---
+name: "custom-drop-rate-range"
+description: "Drop rate must be between 0.01 and 0.95"
+field: "dropRate"
+min: 0.01
+max: 0.95
+appliesTo: "MonsterConfig"

@@ -16,8 +16,19 @@ class DefaultBusinessRulesTest {
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
-        DefaultBusinessRules defaultBusinessRules = new DefaultBusinessRules(objectMapper);
-        rules = defaultBusinessRules.defaultBusinessRules();
+        DefaultBusinessRules dbr = new DefaultBusinessRules(objectMapper);
+        rules = List.of(
+                dbr.monsterHpRangeRule(),
+                dbr.monsterAttackRangeRule(),
+                dbr.monsterLevelRangeRule(),
+                dbr.monsterDropRateRangeRule(),
+                dbr.skillDamageRangeRule(),
+                dbr.skillCooldownRangeRule(),
+                dbr.itemPriceRangeRule(),
+                dbr.questRewardGoldRangeRule(),
+                dbr.growthCurvePointValueRangeRule(),
+                dbr.noNullOrEmptyNameRule()
+        );
     }
 
     private BusinessRule findRule(String name) {

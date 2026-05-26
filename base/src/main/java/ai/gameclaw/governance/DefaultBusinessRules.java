@@ -23,22 +23,6 @@ public class DefaultBusinessRules {
         this.objectMapper = objectMapper;
     }
 
-    @Bean
-    public List<BusinessRule> defaultBusinessRules() {
-        return List.of(
-                monsterHpRangeRule(),
-                monsterAttackRangeRule(),
-                monsterLevelRangeRule(),
-                monsterDropRateRangeRule(),
-                skillDamageRangeRule(),
-                skillCooldownRangeRule(),
-                itemPriceRangeRule(),
-                questRewardGoldRangeRule(),
-                growthCurvePointValueRangeRule(),
-                noNullOrEmptyNameRule()
-        );
-    }
-
     private Map<String, Object> toMap(Object output) {
         if (output == null) {
             return Map.of();

@@ -36,10 +36,25 @@ class ValidationGate2RulesTest {
         assertThat(result.parsed()).isSameAs(monster);
     }
 
+    private List<BusinessRule> createDefaultRules() {
+        DefaultBusinessRules dbr = new DefaultBusinessRules(objectMapper);
+        return List.of(
+                dbr.monsterHpRangeRule(),
+                dbr.monsterAttackRangeRule(),
+                dbr.monsterLevelRangeRule(),
+                dbr.monsterDropRateRangeRule(),
+                dbr.skillDamageRangeRule(),
+                dbr.skillCooldownRangeRule(),
+                dbr.itemPriceRangeRule(),
+                dbr.questRewardGoldRangeRule(),
+                dbr.growthCurvePointValueRangeRule(),
+                dbr.noNullOrEmptyNameRule()
+        );
+    }
+
     @Test
     void monsterHpExceedsMax_violationDetected() {
-        DefaultBusinessRules defaultRules = new DefaultBusinessRules(objectMapper);
-        List<BusinessRule> rules = defaultRules.defaultBusinessRules();
+        List<BusinessRule> rules = createDefaultRules();
         ValidationGate2Rules gate = new ValidationGate2Rules(rules);
 
         Map<String, Object> monster = Map.of(
@@ -53,8 +68,7 @@ class ValidationGate2RulesTest {
 
     @Test
     void monsterWithValidValues_passes() {
-        DefaultBusinessRules defaultRules = new DefaultBusinessRules(objectMapper);
-        List<BusinessRule> rules = defaultRules.defaultBusinessRules();
+        List<BusinessRule> rules = createDefaultRules();
         ValidationGate2Rules gate = new ValidationGate2Rules(rules);
 
         Map<String, Object> monster = Map.of(
@@ -66,8 +80,7 @@ class ValidationGate2RulesTest {
 
     @Test
     void multipleViolationsInOneObject() {
-        DefaultBusinessRules defaultRules = new DefaultBusinessRules(objectMapper);
-        List<BusinessRule> rules = defaultRules.defaultBusinessRules();
+        List<BusinessRule> rules = createDefaultRules();
         ValidationGate2Rules gate = new ValidationGate2Rules(rules);
 
         Map<String, Object> monster = Map.of(
@@ -84,8 +97,7 @@ class ValidationGate2RulesTest {
 
     @Test
     void listOfConfigs_eachValidated() {
-        DefaultBusinessRules defaultRules = new DefaultBusinessRules(objectMapper);
-        List<BusinessRule> rules = defaultRules.defaultBusinessRules();
+        List<BusinessRule> rules = createDefaultRules();
         ValidationGate2Rules gate = new ValidationGate2Rules(rules);
 
         Map<String, Object> validMonster = Map.of(

@@ -1,0 +1,17 @@
+server:
+  port: 8443
+  ssl:
+    enabled: false
+
+spring:
+  ai:
+    mcp:
+      server:
+        name: clickhouse-mcp-server
+        version: 1.0.0
+
+clickhouse:
+  url: jdbc:clickhouse://localhost:8123/default
+  username: mcp_data_warehouse
+  password: ""
+  database: default

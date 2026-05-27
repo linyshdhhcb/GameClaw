@@ -3,6 +3,7 @@ package ai.gameclaw.governance;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,8 +20,8 @@ public class DefaultBusinessRules {
 
     private final ObjectMapper objectMapper;
 
-    public DefaultBusinessRules(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public DefaultBusinessRules(ObjectProvider<ObjectMapper> objectMapperProvider) {
+        this.objectMapper = objectMapperProvider.getIfAvailable(ObjectMapper::new);
     }
 
     private Map<String, Object> toMap(Object output) {

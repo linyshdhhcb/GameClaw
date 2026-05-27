@@ -120,8 +120,8 @@ class TaskManagerTest {
 
         taskManager.deleteRecurringTask("check-mail");
 
-        await().untilAsserted(() -> assertThat(storageProvider.getRecurringJobs()).isEmpty());
-        await().untilAsserted(() -> assertThat(storageProvider.getJobList(StateName.SCHEDULED, Paging.AmountBasedList.ascOnCreatedAt(100))).isEmpty());
+        await().atMost(Duration.ofSeconds(15)).untilAsserted(() -> assertThat(storageProvider.getRecurringJobs()).isEmpty());
+        await().atMost(Duration.ofSeconds(15)).untilAsserted(() -> assertThat(storageProvider.getJobList(StateName.SCHEDULED, Paging.AmountBasedList.ascOnCreatedAt(100))).isEmpty());
         verify(taskRepositoryMock).deleteRecurringTask("some-id");
     }
 

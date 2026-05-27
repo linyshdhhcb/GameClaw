@@ -37,7 +37,14 @@ class ValidationGate2RulesTest {
     }
 
     private List<BusinessRule> createDefaultRules() {
-        DefaultBusinessRules dbr = new DefaultBusinessRules(objectMapper);
+        DefaultBusinessRules dbr = new DefaultBusinessRules(new org.springframework.beans.factory.ObjectProvider<>() {
+            @Override
+            public com.fasterxml.jackson.databind.ObjectMapper getObject() { return objectMapper; }
+            @Override
+            public com.fasterxml.jackson.databind.ObjectMapper getIfAvailable() { return objectMapper; }
+            @Override
+            public com.fasterxml.jackson.databind.ObjectMapper getIfAvailable(java.util.function.Supplier<com.fasterxml.jackson.databind.ObjectMapper> supplier) { return objectMapper; }
+        });
         return List.of(
                 dbr.monsterHpRangeRule(),
                 dbr.monsterAttackRangeRule(),

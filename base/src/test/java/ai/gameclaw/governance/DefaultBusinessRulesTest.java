@@ -16,7 +16,14 @@ class DefaultBusinessRulesTest {
     @BeforeEach
     void setUp() {
         ObjectMapper objectMapper = new ObjectMapper();
-        DefaultBusinessRules dbr = new DefaultBusinessRules(objectMapper);
+        DefaultBusinessRules dbr = new DefaultBusinessRules(new org.springframework.beans.factory.ObjectProvider<>() {
+            @Override
+            public com.fasterxml.jackson.databind.ObjectMapper getObject() { return objectMapper; }
+            @Override
+            public com.fasterxml.jackson.databind.ObjectMapper getIfAvailable() { return objectMapper; }
+            @Override
+            public com.fasterxml.jackson.databind.ObjectMapper getIfAvailable(java.util.function.Supplier<com.fasterxml.jackson.databind.ObjectMapper> supplier) { return objectMapper; }
+        });
         rules = List.of(
                 dbr.monsterHpRangeRule(),
                 dbr.monsterAttackRangeRule(),

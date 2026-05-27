@@ -1,10 +1,135 @@
+<div align="center">
+
 # GameClaw
 
 **Game Enterprise R&D AI Agent Control Plane**
 
-面向游戏企业研发场景的 AI Agent 控制平面，基于 Spring Boot 4 + Java 25 构建。
+面向游戏企业研发场景的 AI Agent 控制平面
 
-## 技术栈
+[![Java](https://img.shields.io/badge/Java-25-orange?logo=openjdk)](https://jdk.java.net/25/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.6-brightgreen?logo=springboot)](https://spring.io/projects/spring-boot)
+[![Spring AI](https://img.shields.io/badge/Spring%20AI-2.0.0--M6-6DB33F?logo=spring)](https://spring.io/projects/spring-ai)
+[![License](https://img.shields.io/badge/License-LGPL%20v3-blue)](LICENSE)
+
+[功能特性](#功能特性) · [快速开始](#快速开始) · [架构](#架构) · [配置](#配置参考) · [贡献](#贡献)
+
+</div>
+
+---
+
+## GameClaw 是什么
+
+GameClaw 是一个专为游戏研发团队设计的 AI Agent 控制平面。它让策划、程序员、QA、运维等角色通过自然语言与 AI 协作，完成游戏配置生成、代码编写、数据查询、测试自动化等日常工作。
+
+**核心价值**：
+
+- **游戏专属** — 内置 Unity / Unreal / Godot 三引擎 API 索引 + 幻觉检测，AI 不会编造不存在的 API
+- **五层安全** — 网络 TLS → 接入 OAuth2 → 应用 RBAC → 数据 RLS → 审计日志，企业级安全开箱即用
+- **多租户隔离** — PostgreSQL 16 Row-Level Security，不同项目/团队数据严格隔离
+- **25+ LLM 供应商** — Anthropic / OpenAI / DeepSeek / Ollama / Groq / 通义千问 / Kimi 等，一键切换
+- **全渠道接入** — Web / 飞书 / Telegram / Discord，同一个 Agent 多端触达
+- **插件生态** — OpenClaw L3 兼容 + Skills 热重载 + MCP 协议，第三方开发者可扩展
+
+---
+
+## 功能特性
+
+### 策划工具
+
+| 工具 | 说明 |
+|------|------|
+| `generate_monsters` | 自然语言描述 → 生成怪物 JSON 配置表 |
+| `generate_skills` | 生成技能配置 |
+| `generate_items` | 生成道具配置 |
+| `generate_quests` | 生成任务配置 |
+| `generate_growth_curve` | 生成成长曲线 CSV |
+| `query_engine_api` | 查询引擎 API（"Unity 如何加载场景"→ SceneManager.LoadScene） |
+
+### 程序员工具
+
+| 工具 | 说明 |
+|------|------|
+| `generate_unity_script` | 需求 → C# 代码 + API 幻觉检测 → 写入沙箱 |
+| `generate_unreal_script` | 同上，C++ |
+| `generate_godot_script` | 同上，GDScript |
+
+### 数据分析工具
+
+| 工具 | 说明 |
+|------|------|
+| `query_data` | 自然语言 → SQL → 双层校验 → 执行 → PII 脱敏返回 |
+
+### 治理与安全
+
+| 层级 | 能力 |
+|------|------|
+| 闸门 1 | Schema 校验（Jackson + Bean Validation） |
+| 闸门 2 | 规则引擎（10 条默认规则 + YAML 自定义） |
+| RBAC | 5 级风险 × 10 种角色，`@RequireRole` / `@RequireRiskLevel` 注解 |
+| 配额 | 三级配额（用户日预算 / 项目月预算 / 全局日预算） |
+| PII | 自动脱敏 + 角色化解密 |
+
+### 插件与扩展
+
+| 能力 | 说明 |
+|------|------|
+| OpenClaw L3 兼容 | `@OpenClawPlugin` + `PluginClassLoader` 隔离 + 资源沙箱 |
+| Skills 热重载 | 修改 SKILL.md 文件 250ms 内自动重载 |
+| MCP 协议 | Spring AI MCP Client + 自建 MCP Server |
+| ClawHub 技能市场 | install / search / update CLI 命令 |
+
+---
+
+## 架构
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Channels (渠道层)                       │
+│   Web Chat │ Feishu │ Telegram │ Discord │ Slack │ WeCom │
+├─────────────────────────────────────────────────────────┤
+│                    Agent (Agent 核心)                      │
+│  LlmClient │ ModelRouter │ FallbackChain │ ChatMemory    │
+├─────────────────────────────────────────────────────────┤
+│                    Tools (工具层)                          │
+│  GameDesign │ GameCode │ GameData │ Sandbox │ MCP │ CLI  │
+├─────────────────────────────────────────────────────────┤
+│                 Governance (治理层)                        │
+│  Gate1 Schema │ Gate2 Rules │ Gate3 Impact │ Gate4 Human │
+├─────────────────────────────────────────────────────────┤
+│                 Infrastructure (基础设施)                  │
+│  Security(RBAC/RLS/PII) │ Observability │ Quota │ Skills │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 项目结构
+
+```
+GameClaw/
+├── base/                    # 核心模块（20 个子包）
+│   ├── agent/               # Agent 核心 + LLM 抽象
+│   ├── channels/            # 渠道注册 + 会话管理
+│   ├── compat/              # OpenClaw 兼容层 + L3 插件系统
+│   ├── concurrency/         # StructuredTaskScope 封装
+│   ├── configuration/       # YAML/JSON 双格式配置
+│   ├── cost/                # 三级配额管理
+│   ├── files/               # YAML frontmatter 解析
+│   ├── governance/          # 四层闸门 + 规则引擎
+│   ├── mcp/                 # MCP 连接配置
+│   ├── observability/       # Micrometer 指标 + 审计
+│   ├── persistence/         # 多租户数据源 + RLS
+│   ├── project/             # 项目管理
+│   ├── security/            # RBAC + PII + Prompt 注入检测
+│   ├── skills/              # Skills 解析 + 热重载 + ClawHub
+│   ├── tasks/               # JobRunr 任务调度
+│   └── tools/               # 游戏工具 + 数据工具 + 沙箱
+├── providers/               # LLM 供应商（7 家原生 + 18 家 OpenAI 兼容）
+├── plugins/                 # 渠道插件（飞书/Telegram/Discord/Brave/Playwright）
+├── mcp-servers/java/        # MCP Server（ClickHouse）
+├── app/                     # Spring Boot 启动模块 + CLI
+└── deploy/docker/           # Docker 部署 (PG16)
+```
+
+### 技术栈
 
 | 组件 | 版本 | 说明 |
 |------|------|------|
@@ -18,237 +143,25 @@
 | Flyway | — | 数据库迁移 |
 | Testcontainers | 1.21.4 | 集成测试 |
 
-## 项目结构
+---
 
-```
-GameClaw/
-├── base/                    # 核心模块（18 个子包）
-├── providers/               # LLM 供应商实现
-│   ├── anthropic/           # Anthropic Claude
-│   ├── openai/              # OpenAI + 18 家 OpenAI 兼容供应商
-│   ├── ollama/              # Ollama 本地模型
-│   ├── google/              # Google Gemini
-│   ├── deepseek/            # DeepSeek (V3/R1)
-│   ├── mistral/             # Mistral AI (Large/Codestral)
-│   └── minimax/             # MiniMax (Text-01/abab)
-├── plugins/                 # 渠道/工具插件
-│   ├── feishu/              # 飞书 Bot
-│   ├── telegram/            # Telegram Bot
-│   ├── discord/             # Discord Bot
-│   ├── brave/               # Brave Web Search
-│   └── playwright/          # Playwright 浏览器自动化
-├── mcp-servers/java/        # MCP Server 模块
-├── app/                     # Spring Boot 启动模块 + CLI
-└── deploy/docker/           # Docker 部署 (PG16)
-```
+## 快速开始
 
-## 功能模块
-
-### 核心模块 (base)
-
-| 模块 | 功能点 |
-|------|--------|
-| **agent** | Agent 接口 (`respondTo`/`prompt`)、DefaultAgent 实现、LlmClient 统一抽象 (call/stream/embed)、Spring AI / LangChain4j 双适配、对话记忆 (FileSystem + JDBC)、ModelRouter 复杂度路由 (SIMPLE/STANDARD/COMPLEX)、FallbackChain 跨模型降级 (Resilience4j CircuitBreaker)、RoutingLlmClient 路由装饰器 |
-| **channels** | Channel 接口 + ChannelRegistry 注册中心、Conversation/Message 实体、ConversationService 会话管理、JdbcChatMemoryRepository 桥接 Spring AI |
-| **configuration** | ConfigurationManager YAML 读写、DualFormatConfigurationManager 双格式同步 (YAML + JSON)、ConfigurationChangedEvent 变更事件 |
-| **concurrency** | Scopes.race()/all() 封装 StructuredTaskScope、ConcurrencyBanner 启动横幅、PinningWatcher JFR 监控 |
-| **cost** | QuotaManager 配额管理接口、JdbcQuotaManager 三级配额实现 (用户日预算/项目月预算/全局日预算)、QuotaResetJob 定时重置 (JobRunr)、QuotaExhaustedException 配额耗尽异常、V6 迁移 (quotas 表 + RLS) |
-| **files** | YamlParser 轻量 frontmatter 解析器、YamlDocument 文档模型 |
-| **governance** | ValidationGate 闸门接口、ValidationGate1Schema (Jackson + Bean Validation)、ValidationGate2Rules 轻量规则引擎 (BusinessRule 函数接口 + @ConditionalOnBean)、DefaultBusinessRules 10 条默认规则 (HP/attack/level/dropRate/damage/cooldown/price/rewardGold/expRequired/name)、CustomRuleLoader YAML 自定义规则加载、ValidatedLlmOutput 多闸门链式验证 + 自动重试、GovernancePolicy 治理策略 |
-| **mcp** | McpConnectionsProperties 连接配置、McpHeaderCustomizer 请求头注入 |
-| **observability** | AiMetrics Micrometer 指标集 (7 类)、AiMetricsAspect AOP 自动采集、AuditLogger 审计日志、PinningWatcher 虚拟线程 Pinning 监控 |
-| **onboarding** | OnboardingProvider 引导步骤接口、AgentOnboardingProvider 供应商引导接口、AgentOnboardingProviders 注册中心 |
-| **persistence** | TenantAwareDataSourceConfig 多租户数据源、TenantSettingsAspect RLS 会话变量注入、TenantAwareRepository 租户感知仓储 |
-| **project** | Project 实体、ProjectManager 项目管理接口 |
-| **providers** | AgentProvider 供应商聚合器、getDefaultChatModel 默认模型获取 |
-| **security** | TenantContext + TenantContextHolder (ScopedValue)、RBAC 5 级风险 × 10 种角色、@RequireRole/@RequireRiskLevel 注解 + AOP、DefaultRbacService (DB + Caffeine 双缓存 + fallback 矩阵)、PromptSanitizer 7 种注入检测、OutboundUrlFilter 出站白名单、PiiMasking PII 脱敏、PiiFieldRegistry 字段分类 (5 类)、PiiMaskingPostProcessor 角色化解密 (ADMIN/DATA_ANALYST 全可见)、SingleTenantFallback 单租户回退 |
-| **skills** | GameClawSkillParser SKILL.md 解析、GameClawSkillsLoader 四级优先级加载 (classpath → ~/.openclaw → ~/.gameclaw → workspace)、Caffeine LRU 缓存、SkillsWatcher 热重载 (WatchService + 250ms 防抖 + 虚拟线程 + 可选轮询模式)、ClawHubClient 技能市场 (install/search/update + @ConditionalOnProperty)、SkillsChangedEvent/SkillInstalledEvent Spring 事件 |
-| **tasks** | Task/RecurringTask 实体、TaskManager (JobRunr 调度)、TaskHandler Agent 执行、FileSystemTaskRepository YAML 文件存储 |
-| **tools** | TaskTool 任务工具、CheckListTool 清单工具、McpTool MCP 服务器管理、@GameTool 工具注册注解、AgentEnvironment 运行环境信息、Lucene 动态工具发现 |
-| **tools/game** | GameDesignTool 策划配置生成 (怪物/技能/道具/任务/成长曲线)、GameCodeTool 代码生成 (Unity/Unreal/Godot)、ApiHallucinationDetector API 幻觉检测 + 引擎 API 查询、Engine 枚举 (UNITY/UNREAL/GODOT) |
-| **tools/data** | GameDataTool NL→SQL 数据查询 (仅 SELECT)、SqlSafetyValidator JSqlParser 双层校验、Caffeine L1 查询缓存 (5min TTL) |
-| **tools/sandbox** | SandboxWriter 租户隔离沙箱写入 (防 path traversal)、workspace/output/ 输出隔离 |
-| **compat** | ConfigPathMapper OpenClaw → GameClaw 配置键映射、OpenClawPluginLoader L3 插件加载器 (JAR/目录/批量)、PluginClassLoader 类隔离 (拦截 ai.gameclaw.internal.*)、PluginManifest plugin.json 解析、PluginFs 文件沙箱 (防 path traversal)、PluginAwareHttpClient 网络沙箱 (白名单过滤)、PluginRegistry Spring Bean 注册 + ApplicationReady 自动加载、PluginLoadedEvent 事件驱动解耦、@OpenClawPlugin 注解 + OpenClawTool 接口 |
-
-### 供应商模块 (providers)
-
-| 模块 | 功能点 |
-|------|--------|
-| **anthropic** | AnthropicAgentOnboardingProvider (claude-sonnet-4-6)、Claude Code OAuth Token 自动发现 (macOS Keychain / Linux credentials)、自定义 Backend (Bearer Token + anthropic-beta) |
-| **openai** | OpenAIAgentOnboardingProvider (gpt-5.4) + 18 家 OpenAI 兼容供应商，基于 `OpenAICompatibleProvider` 抽象基类，统一复用 `spring-ai-starter-model-openai` + 自定义 `base-url` |
-| **ollama** | OllamaAgentOnboardingProvider (qwen3.5:27b, 无需 API Key) |
-| **google** | GoogleGenAIAgentOnboardingProvider (gemini-3-flash-preview) |
-| **deepseek** | DeepSeekAgentOnboardingProvider (deepseek-chat)、DeepSeek-V3 通用对话 / DeepSeek-R1 深度推理 |
-| **mistral** | MistralAgentOnboardingProvider (mistral-large-latest)、Mistral Large 通用对话 / Codestral 代码生成 |
-| **minimax** | MiniMaxAgentOnboardingProvider (MiniMax-Text-01)、中文对话 / 长上下文理解 |
-
-### OpenAI 兼容供应商 (providers/openai)
-
-基于 `OpenAICompatibleProvider` 抽象基类，统一复用 `spring-ai-starter-model-openai` + 自定义 `base-url`，原生 OpenAI 与 18 家兼容供应商共享 OpenAI 协议的参数标准化与错误处理。
-
-| 供应商 | 默认模型 | API 端点 | 推荐场景 |
-|--------|----------|----------|----------|
-| **Groq** | llama-3.3-70b-versatile | api.groq.com/openai/v1 | LPU 超低延迟推理、实时对话 |
-| **xAI Grok** | grok-4-latest | api.x.ai/v1 | Grok 系列模型、实时信息 |
-| **OpenRouter** | anthropic/claude-sonnet-4-6 | openrouter.ai/api/v1 | 300+ 模型统一网关、跨供应商路由 |
-| **Hugging Face** | meta-llama/Llama-3.3-70B-Instruct | api-inference.huggingface.co/v1 | 开源模型推理、Serverless API |
-| **GitHub Copilot** | gpt-4o | models.inference.ai.azure.com | GitHub Models、GitHub PAT 认证 |
-| **Qwen (通义千问)** | qwen-max-latest | dashscope.aliyuncs.com/compatible-mode/v1 | 阿里云 DashScope、中文对话 |
-| **Qianfan (千帆)** | ernie-4.5-turbo-128k | qianfan.baidubce.com/v2 | 百度 ERNIE 系列、中文理解 |
-| **Moonshot (Kimi)** | moonshot-v1-128k | api.moonshot.cn/v1 | 长上下文 (128K)、文档理解 |
-| **StepFun (阶跃星辰)** | step-2-16k | api.stepfun.com/v1 | 多模态、Step-2 系列 |
-| **Tencent Cloud (混元)** | hunyuan-turbos-latest | api.hunyuan.cloud.tencent.com/v1 | 腾讯混元、中文对话 |
-| **Volcengine (火山引擎)** | doubao-1.5-pro-32k | ark.cn-beijing.volces.com/api/v3 | 字节豆包、国内合规 |
-| **BytePlus** | skylark-pro-32k | ark.ap-southeast.bytepluses.com/api/v3 | 海外 ModelArk、国际合规 |
-| **Z.AI (智谱 GLM)** | glm-4.5 | open.bigmodel.cn/api/paas/v4 | 智谱 GLM-4.5、代码生成 |
-| **Xiaomi (MiLM)** | mimo-7b-rl | api.xiaomi.com/v1 | 小米 MiLM、轻量推理 |
-| **Alibaba Model Studio** | qwen-max-latest | dashscope-intl.aliyuncs.com/compatible-mode/v1 | 阿里云百炼海外站、国际合规 |
-| **SenseNova (商汤)** | SenseChat-5 | api.sensenova.cn/compatible-mode/v1 | 商汤日日新、多模态 |
-| **Synthetic** | hf:meta-llama/Llama-3.3-70B-Instruct | api.synthetic.new/v1 | 开源模型托管、多模型聚合 |
-| **SiliconFlow (硅基流动)** | Qwen/Qwen2.5-72B-Instruct | api.siliconflow.cn/v1 | 硅基流动 SiliconCloud、开源模型聚合 |
-
-### 插件模块 (plugins)
-
-| 模块 | 功能点 |
-|------|--------|
-| **feishu** | FeishuChannel 渠道实现、FeishuEventController 事件回调 (HMAC-SHA256 签名验证 + Nonce 防重放)、FeishuApiClient (tenant_access_token 自动管理)、FeishuCardBuilder 卡片消息 (markdown/代码块/表格/按钮)、SlashCommandRouter 斜杠命令 (/design /query /review)、FeishuTenantRegistry 租户映射 |
-| **telegram** | TelegramChannel (SpringLongPollingBot)、Markdown→HTML 转换、用户白名单、线程对话 |
-| **discord** | DiscordChannel (JDA ListenerAdapter)、私聊/@触发、用户白名单 |
-| **brave** | Brave Web Search 自动配置 (ConditionalOnProperty) |
-| **playwright** | PlaywrightBrowserTool 浏览器自动化 (导航/点击/填表/提取/截图/JS执行) |
-
-### MCP Server 模块 (mcp-servers/java)
-
-| 模块 | 功能点 |
-|------|--------|
-| **clickhouse-mcp-server** | ClickHouseTools (list_tables/describe_table/execute_query)、SqlSafetyValidator JSqlParser SELECT-only 校验、只读账号 mcp_data_warehouse、BearerTokenFilter Bearer Token 鉴权、ClickHouseProperties 连接配置 |
-
-### CLI 命令 (app/cli)
-
-基于 Picocli 的命令行工具，`gameclaw` 主命令 + 子命令：
-
-| 命令 | 说明 |
-|------|------|
-| `gameclaw skill install <name>` | 从 ClawHub 安装技能包 |
-| `gameclaw skill install <name>@<version>` | 安装指定版本 |
-| `gameclaw skill search <query>` | 搜索 ClawHub 技能市场 |
-| `gameclaw skill update --all` | 更新所有已安装技能 |
-| `gameclaw skill list --installed` | 列出已安装技能 |
-| `gameclaw quota check <tenantId>` | 检查配额是否可用 |
-| `gameclaw quota remaining <tenantId>` | 查看剩余配额 |
-
-### 引擎 API 索引 (workspace/game-skills)
-
-| 引擎 | API 数量 | 说明 |
-|------|----------|------|
-| Unity | 269 | UnityEngine / UnityEditor 核心 API |
-| Unreal | 151 | U/A/F 前缀 + GEngine/GetWorld |
-| Godot | 196 | GDScript 核心 + Server API |
-
-### 数据分析 Skills (workspace/game-skills/data-analysis)
-
-| 模板 | 说明 |
-|------|------|
-| DAU 查询 | 近7天/30天 DAU 趋势、环比同比、分渠道/分地区 DAU |
-| 留存查询 | 次日/7日/30日留存、分渠道留存、留存趋势 |
-| 付费查询 | 付费总额、ARPU/ARPPU、付费率、分档位分布、LTV |
-
-## 启动后能做什么
-
-### 开箱即用（无需额外配置）
-
-| 能力 | 说明 |
-|------|------|
-| Web 聊天界面 | http://localhost:8090/chat — 角色选择器（策划/程序员/QA 等）、消息输入框、工具列表展示 |
-| 引导向导 | http://localhost:8090/onboarding — 10 步引导配置 LLM 供应商、API Key、角色绑定 |
-| SSE 流式对话 | `/api/chat/sse` 端点可用，支持流式输出 |
-| 角色切换 | 前端可切换 10 种角色，不同角色看到不同工具集 |
-| JobRunr 后台任务 | http://localhost:8091/dashboard — 任务调度面板 |
-| Prometheus 指标 | http://localhost:8090/actuator/prometheus — 7 类 AI 指标 |
-| API 幻觉检测 | 引擎 API 索引已加载（Unity 269 / Unreal 151 / Godot 196），可查询引擎 API |
-| 多语言切换 | UI 支持中文/英文切换，URL `?lang=zh` 或 `?lang=en`，Cookie 持久化 |
-| Skills 热重载 | 修改 SKILL.md 文件 250ms 内自动重载，无需重启 |
-| 闸门 2 规则引擎 | 10 条默认业务规则（HP/攻击/等级/掉落率等范围校验），支持 YAML 自定义规则 |
-| 三级配额 | 用户日预算 (1元) / 项目月预算 (1000元) / 全局日预算 (10000元)，超限阻断 |
-
-### 配置 LLM 后可用
-
-完成 Onboarding（选择供应商 + 填 API Key）后，以下能力全部可用：
-
-| 能力 | 工具名 | 说明 |
-|------|--------|------|
-| 生成怪物配置 | `generate_monsters` | 输入描述 → 生成 JSON 配置表 → 写入沙箱 |
-| 生成技能配置 | `generate_skills` | 同上 |
-| 生成道具配置 | `generate_items` | 同上 |
-| 生成任务配置 | `generate_quests` | 同上 |
-| 生成成长曲线 | `generate_growth_curve` | 输入参数 → 生成 CSV → 写入沙箱 |
-| 生成 Unity 脚本 | `generate_unity_script` | 输入需求 → 生成 C# 代码 + API 幻觉检测 → 写入沙箱 |
-| 生成 Unreal 代码 | `generate_unreal_script` | 同上，C++ |
-| 生成 Godot 脚本 | `generate_godot_script` | 同上，GDScript |
-| 查询引擎 API | `query_engine_api` | 自然语言查 API（如"Unity 如何加载场景"→ SceneManager.LoadScene） |
-| 自然语言查数据 | `query_data` | 输入问题 → LLM 生成 SQL → 双层校验 → 执行 → PII 脱敏返回 |
-| 任务创建/调度 | `TaskTool` | 创建一次性/定时/周期任务 |
-| 清单管理 | `CheckListTool` | 创建结构化清单 |
-| MCP 服务器注册 | `McpTool` | 运行时添加 MCP 服务器 |
-| 浏览器自动化 | Playwright 工具 | 导航/点击/填表/截图（需启用 playwright 插件） |
-
-### 配置渠道后可用
-
-| 渠道 | 配置项 | 能力 |
-|------|--------|------|
-| 飞书 | `agent.channels.feishu.app-id/secret` | 飞书群聊对话、卡片消息回复、斜杠命令 |
-| Telegram | `agent.channels.telegram.token` | Bot 对话、用户白名单 |
-| Discord | `agent.channels.discord.token` | Bot 对话、@触发 |
-
-## 使用前准备
-
-### 环境清单
+### 环境要求
 
 | 依赖 | 最低版本 | 必需 | 说明 |
 |------|----------|------|------|
-| JDK | 25 | ✅ | 下载 [jdk-25](https://jdk.java.net/25/)，设置 `JAVA_HOME` |
-| Maven | 3.9 | ✅ | 构建 + 启动项目 |
-| LLM API Key | — | ✅ | 至少准备一个：Anthropic / OpenAI / Google Gemini / DeepSeek / Mistral / MiniMax / Groq / xAI / OpenRouter / Qwen / Moonshot / Z.AI / SiliconFlow / Ollama 本地 等 25 家供应商 |
-| PostgreSQL | 16 | ❌ | 仅多租户模式需要，单租户用内嵌 H2 |
-| Docker | — | ❌ | 仅 PG16 多租户模式需要 |
-
-### LLM 供应商选择
-
-| 供应商 | 需要 API Key | 配置项 | 推荐场景 |
-|--------|-------------|--------|----------|
-| Ollama | ❌ 无需 | 安装 [Ollama](https://ollama.ai) → `ollama pull qwen3.5:27b` | 本地开发、零成本体验 |
-| Anthropic | ✅ | `spring.ai.anthropic.api-key` | 生产环境、Claude 系列模型 |
-| OpenAI | ✅ | `spring.ai.openai.api-key` | 生产环境、GPT 系列模型 |
-| Google | ✅ | `spring.ai.gemini.api-key` | 生产环境、Gemini 系列模型 |
-| DeepSeek | ✅ | `spring.ai.deepseek.api-key` | 深度推理 (R1)、高性价比对话 (V3)、游戏策划辅助 |
-| Mistral AI | ✅ | `spring.ai.mistral-ai.api-key` | 代码生成 (Codestral)、多语言对话、欧洲合规 |
-| MiniMax | ✅ | `spring.ai.minimax.api-key` | 中文对话、长上下文理解、国内合规 |
-| Groq | ✅ | `spring.ai.openai.api-key` + `base-url: api.groq.com/openai/v1` | LPU 超低延迟推理、实时对话 |
-| xAI Grok | ✅ | `spring.ai.openai.api-key` + `base-url: api.x.ai/v1` | Grok 系列模型、实时信息 |
-| OpenRouter | ✅ | `spring.ai.openai.api-key` + `base-url: openrouter.ai/api/v1` | 300+ 模型统一网关、跨供应商路由 |
-| Hugging Face | ✅ | `spring.ai.openai.api-key` + `base-url: api-inference.huggingface.co/v1` | 开源模型推理、Serverless API |
-| GitHub Copilot | ✅ | `spring.ai.openai.api-key` + `base-url: models.inference.ai.azure.com` | GitHub Models、GitHub PAT 认证 |
-| Qwen (通义千问) | ✅ | `spring.ai.openai.api-key` + `base-url: dashscope.aliyuncs.com/compatible-mode/v1` | 阿里云 DashScope、中文对话 |
-| Qianfan (千帆) | ✅ | `spring.ai.openai.api-key` + `base-url: qianfan.baidubce.com/v2` | 百度 ERNIE 系列、中文理解 |
-| Moonshot (Kimi) | ✅ | `spring.ai.openai.api-key` + `base-url: api.moonshot.cn/v1` | 长上下文 (128K)、文档理解 |
-| StepFun (阶跃星辰) | ✅ | `spring.ai.openai.api-key` + `base-url: api.stepfun.com/v1` | 多模态、Step-2 系列 |
-| Tencent Cloud (混元) | ✅ | `spring.ai.openai.api-key` + `base-url: api.hunyuan.cloud.tencent.com/v1` | 腾讯混元、中文对话 |
-| Volcengine (火山引擎) | ✅ | `spring.ai.openai.api-key` + `base-url: ark.cn-beijing.volces.com/api/v3` | 字节豆包、国内合规 |
-| BytePlus | ✅ | `spring.ai.openai.api-key` + `base-url: ark.ap-southeast.bytepluses.com/api/v3` | 海外 ModelArk、国际合规 |
-| Z.AI (智谱 GLM) | ✅ | `spring.ai.openai.api-key` + `base-url: open.bigmodel.cn/api/paas/v4` | 智谱 GLM-4.5、代码生成 |
-| Xiaomi (MiLM) | ✅ | `spring.ai.openai.api-key` + `base-url: api.xiaomi.com/v1` | 小米 MiLM、轻量推理 |
-| Alibaba Model Studio | ✅ | `spring.ai.openai.api-key` + `base-url: dashscope-intl.aliyuncs.com/compatible-mode/v1` | 阿里云百炼海外站、国际合规 |
-| SenseNova (商汤) | ✅ | `spring.ai.openai.api-key` + `base-url: api.sensenova.cn/compatible-mode/v1` | 商汤日日新、多模态 |
-| Synthetic | ✅ | `spring.ai.openai.api-key` + `base-url: api.synthetic.new/v1` | 开源模型托管、多模型聚合 |
-| SiliconFlow (硅基流动) | ✅ | `spring.ai.openai.api-key` + `base-url: api.siliconflow.cn/v1` | 硅基流动 SiliconCloud、开源模型聚合 |
-
-## 快速开始
+| JDK | 25 | Yes | [下载 jdk-25](https://jdk.java.net/25/) |
+| Maven | 3.9 | Yes | 构建 + 启动 |
+| LLM API Key | — | Yes | 25+ 供应商可选（Ollama 可零成本本地运行） |
+| PostgreSQL | 16 | No | 仅多租户模式，单租户用内嵌 H2 |
+| Docker | — | No | 仅 PG16 多租户模式 |
 
 ### 1. 克隆 & 编译
 
 ```bash
-git clone https://github.com/your-org/claw.git
-cd claw/GameClaw
+git clone https://github.com/linyshdhhcb/GameClaw.git
+cd GameClaw
 
 # Windows
 $env:JAVA_HOME = "C:\Program Files\Java\jdk-25"
@@ -259,63 +172,28 @@ export JAVA_HOME=/path/to/jdk-25
 mvn compile
 ```
 
-### 2. 配置 LLM（二选一）
+### 2. 配置 LLM
 
 **方式 A：Ollama 本地模型（零成本）**
 
 ```bash
-# 安装 Ollama 并拉取模型
 ollama pull qwen3.5:27b
 ```
 
-启动后在 Onboarding 向导中选择 Ollama 即可，无需填写 API Key。
+启动后在 Onboarding 向导中选择 Ollama，无需 API Key。
 
 **方式 B：云端 API Key**
 
-创建 `app/src/main/resources/application.private.yaml`（已被 .gitignore 忽略）：
+创建 `app/src/main/resources/application.private.yaml`（已 .gitignore）：
 
 ```yaml
-# 必须指定激活的模型供应商（覆盖默认值 unknown）
 spring.ai.model.chat: deepseek
-
-# Anthropic
-# spring.ai.model.chat: anthropic
-# spring.ai.anthropic.api-key: sk-ant-xxx
-
-# 或 OpenAI
-# spring.ai.model.chat: openai
-# spring.ai.openai.api-key: sk-xxx
-
-# 或 Google Gemini
-# spring.ai.model.chat: gemini
-# spring.ai.gemini.api-key: AIzaxxx
-
-# 或 DeepSeek
-# spring.ai.model.chat: deepseek
-# spring.ai.deepseek.api-key: sk-xxx
-
-# 或 Mistral AI
-# spring.ai.model.chat: mistral-ai
-# spring.ai.mistral-ai.api-key: xxx
-
-# 或 MiniMax
-# spring.ai.model.chat: minimax
-# spring.ai.minimax.api-key: xxx
-
-# 或 Ollama（本地，无需 API Key）
-# spring.ai.model.chat: ollama
-
-# 或 OpenAI 兼容供应商（以 Groq 为例，Onboarding 向导会自动设置 base-url）
-# spring.ai.model.chat: openai
-# spring.ai.openai.api-key: gsk_xxx
-# spring.ai.openai.base-url: https://api.groq.com/openai/v1
+spring.ai.deepseek.api-key: sk-xxx
 ```
 
-> **重要**：`spring.ai.model.chat` 是激活模型的关键配置。`application.yaml` 中默认值为 `unknown`（不激活任何模型），必须在 `application.private.yaml` 中显式指定供应商名称，否则聊天会返回"No AI model has been configured"。
+> `spring.ai.model.chat` 必须显式指定，默认值 `unknown` 不激活任何模型。
 
-> `application.yaml` 中已配置 `spring.config.import: optional:classpath:application.private.yaml`，私有配置会自动加载。
-
-### 3. 启动（H2 单租户模式）
+### 3. 启动
 
 ```bash
 mvn spring-boot:run -pl app
@@ -323,40 +201,23 @@ mvn spring-boot:run -pl app
 
 启动成功后访问：
 - Web 界面：http://localhost:8090
-- 引导向导：http://localhost:8090/onboarding（首次启动必须完成引导）
+- 引导向导：http://localhost:8090/onboarding
 - Prometheus：http://localhost:8090/actuator/prometheus
 - JobRunr：http://localhost:8091/dashboard
 
-### 4. 完成 Onboarding 引导
+### 4. 完成 Onboarding
 
-首次启动后访问 http://localhost:8090/onboarding，按步骤完成：
+首次启动访问 http://localhost:8090/onboarding → 选择供应商 → 填 API Key → 选模型 → 绑定角色 → 开始对话
 
-1. 选择 LLM 供应商
-2. 填写 API Key（Ollama 跳过）
-3. 选择默认模型
-4. 绑定用户角色（策划/程序员/QA 等）
-5. 完成后即可开始对话
-
-### 5. 启动（PG16 多租户模式，可选）
+### 5. 多租户模式（可选）
 
 ```bash
-# 启动 PostgreSQL 容器
-cd deploy/docker
-docker-compose up -d
-
-# 修改 app/src/main/resources/application.yaml
-# spring.datasource.url=jdbc:postgresql://localhost:5432/gameclaw
-# spring.datasource.username=linyi
-# spring.datasource.password=your_password
-# spring.flyway.enabled=true
-# gameclaw.multi-tenancy.enabled=true
-
+cd deploy/docker && docker-compose up -d
+# 修改 application.yaml: spring.datasource.url / flyway.enabled / multi-tenancy.enabled
 mvn spring-boot:run -pl app
 ```
 
 ### 6. 配置渠道（可选）
-
-在 `application.private.yaml` 中添加：
 
 ```yaml
 # 飞书
@@ -366,19 +227,99 @@ agent.channels.feishu.verification-token: xxx
 
 # Telegram
 agent.channels.telegram.token: 123456:ABC-xxx
-agent.channels.telegram.username: your_bot
 
 # Discord
 agent.channels.discord.token: your-discord-bot-token
-agent.channels.discord.allowed-user: your-user-id
 ```
+
+---
+
+## LLM 供应商
+
+### 原生供应商
+
+| 供应商 | 默认模型 | 推荐场景 |
+|--------|----------|----------|
+| Anthropic | claude-sonnet-4-6 | 生产环境、Claude 系列 |
+| OpenAI | gpt-5.4 | 生产环境、GPT 系列 |
+| Ollama | qwen3.5:27b | 本地开发、零成本体验 |
+| Google Gemini | gemini-3-flash-preview | 生产环境、Gemini 系列 |
+| DeepSeek | deepseek-chat | 深度推理 (R1)、游戏策划辅助 |
+| Mistral AI | mistral-large-latest | 代码生成 (Codestral)、欧洲合规 |
+| MiniMax | MiniMax-Text-01 | 中文对话、长上下文 |
+
+### OpenAI 兼容供应商（18 家）
+
+基于 `OpenAICompatibleProvider` 抽象基类，统一复用 `spring-ai-starter-model-openai` + 自定义 `base-url`：
+
+| 供应商 | 推荐场景 |
+|--------|----------|
+| Groq | LPU 超低延迟推理 |
+| xAI Grok | Grok 系列模型 |
+| OpenRouter | 300+ 模型统一网关 |
+| Hugging Face | 开源模型 Serverless API |
+| GitHub Copilot | GitHub Models |
+| Qwen (通义千问) | 阿里云 DashScope |
+| Qianfan (千帆) | 百度 ERNIE 系列 |
+| Moonshot (Kimi) | 长上下文 128K |
+| StepFun (阶跃星辰) | 多模态 |
+| Tencent Cloud (混元) | 腾讯混元 |
+| Volcengine (火山引擎) | 字节豆包 |
+| BytePlus | 海外 ModelArk |
+| Z.AI (智谱 GLM) | GLM-4.5 代码生成 |
+| Xiaomi (MiLM) | 轻量推理 |
+| Alibaba Model Studio | 百炼海外站 |
+| SenseNova (商汤) | 多模态 |
+| Synthetic | 开源模型托管 |
+| SiliconFlow (硅基流动) | 开源模型聚合 |
+
+---
+
+## 插件与扩展
+
+### 渠道插件
+
+| 插件 | 说明 |
+|------|------|
+| **feishu** | 飞书 Bot（HMAC 签名 + 卡片消息 + 斜杠命令） |
+| **telegram** | Telegram Bot（Markdown→HTML + 白名单） |
+| **discord** | Discord Bot（@触发 + 白名单） |
+| **brave** | Brave Web Search |
+| **playwright** | 浏览器自动化（导航/点击/截图/JS执行） |
+
+### MCP Server
+
+| Server | 说明 |
+|--------|------|
+| **clickhouse-mcp-server** | ClickHouse 数据查询（SELECT-only + Bearer Token 鉴权） |
+
+### CLI 命令
+
+```bash
+gameclaw skill install <name>     # 安装技能包
+gameclaw skill search <query>     # 搜索技能市场
+gameclaw skill update --all       # 更新所有技能
+gameclaw skill list --installed   # 列出已安装技能
+gameclaw quota check <tenantId>   # 检查配额
+gameclaw quota remaining <tenantId> # 查看剩余配额
+```
+
+### 引擎 API 索引
+
+| 引擎 | API 数量 |
+|------|----------|
+| Unity | 269 |
+| Unreal | 151 |
+| Godot | 196 |
+
+---
 
 ## 配置参考
 
 | 配置项 | 默认值 | 说明 |
 |--------|--------|------|
 | `server.port` | 8090 | HTTP 端口 |
-| `spring.ai.model.chat` | unknown | 激活的聊天模型供应商（anthropic/openai/ollama/gemini/deepseek/mistral-ai/minimax，必须显式指定） |
+| `spring.ai.model.chat` | unknown | 激活的 LLM 供应商（必须显式指定） |
 | `gameclaw.llm.adapter` | spring-ai | LLM 适配器 (spring-ai / langchain4j) |
 | `gameclaw.workspace` | file:./workspace/ | 工作空间路径 |
 | `gameclaw.multi-tenancy.enabled` | false | 多租户开关 |
@@ -394,13 +335,65 @@ agent.channels.discord.allowed-user: your-user-id
 | `gameclaw.quota.global-daily-limit` | 10000.0 | 全局日预算 (CNY) |
 | `gameclaw.llm.model-map.*` | haiku/sonnet/opus | 复杂度→模型映射 |
 | `gameclaw.llm.fallback-map.*` | sonnet/haiku/sonnet | 复杂度→降级模型映射 |
-| `gameclaw.skills.polling-interval` | 0 | Skills 轮询间隔 (ms, 0=禁用, Docker 环境建议 30000) |
+| `gameclaw.skills.polling-interval` | 0 | Skills 轮询间隔 (ms, 0=禁用) |
 | `gameclaw.clawhub.enabled` | false | ClawHub 技能市场开关 |
-| `gameclaw.clawhub.registry-url` | https://registry.clawhub.io | ClawHub 注册中心地址 |
+| `gameclaw.clawhub.registry-url` | https://registry.clawhub.io | ClawHub 注册中心 |
 | `gameclaw.plugins.enabled` | false | OpenClaw L3 插件系统开关 |
 | `spring.messages.basename` | i18n/messages | i18n 消息资源路径 |
-| `spring.messages.encoding` | UTF-8 | 消息资源编码 |
+
+---
+
+## 安全模型
+
+GameClaw 采用五层纵深防御架构：
+
+| 层级 | 组件 | 说明 |
+|------|------|------|
+| L1 网络 | TLS 1.3 + OutboundUrlFilter | 传输加密 + 出站白名单 |
+| L2 接入 | Spring Security + OAuth2 | 认证鉴权 |
+| L3 应用 | RBAC + PromptSanitizer | 5级风险×10角色 + 7种注入检测 |
+| L4 数据 | RLS + PiiMasking | PostgreSQL 行级安全 + PII 脱敏 |
+| L5 审计 | AuditLogger | 全链路审计日志 |
+
+---
+
+## 贡献
+
+欢迎贡献！请遵循以下流程：
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/amazing-feature`)
+3. 提交改动 (`git commit -m 'feat: add amazing feature'`)
+4. 推送分支 (`git push origin feature/amazing-feature`)
+5. 创建 Pull Request
+
+### 开发规范
+
+- JDK 25 + Maven
+- 遵循 Spring Modulith 模块边界
+- 单元测试使用 AssertJ + JUnit 5
+- 提交信息遵循 [Conventional Commits](https://www.conventionalcommits.org/)
+
+---
 
 ## License
 
 GNU Lesser General Public License v3.0 — see [LICENSE](LICENSE)
+
+---
+
+## 作者
+
+**linyi**
+
+联系：jingshuihuayue@qq.com
+
+## 项目参考
+
+GameClaw 的设计与实现参考了以下优秀项目：
+
+| 项目 | 说明 |
+|------|------|
+| [OpenClaw](https://github.com/openclaw/openclaw) | AI Agent 开源规范与兼容接口定义 |
+| [GoClaw](https://github.com/nextlevelbuilder/goclaw) | Go 语言实现的 AI Agent 控制平面 |
+| [JavaClaw](https://github.com/jobrunr/JavaClaw) | Java 语言实现的 AI Agent 框架，GameClaw 的迁移前身 |

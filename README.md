@@ -68,7 +68,7 @@ GameClaw/
 | **tools/game** | GameDesignTool 策划配置生成 (怪物/技能/道具/任务/成长曲线)、GameCodeTool 代码生成 (Unity/Unreal/Godot)、ApiHallucinationDetector API 幻觉检测 + 引擎 API 查询、Engine 枚举 (UNITY/UNREAL/GODOT) |
 | **tools/data** | GameDataTool NL→SQL 数据查询 (仅 SELECT)、SqlSafetyValidator JSqlParser 双层校验、Caffeine L1 查询缓存 (5min TTL) |
 | **tools/sandbox** | SandboxWriter 租户隔离沙箱写入 (防 path traversal)、workspace/output/ 输出隔离 |
-| **compat** | ConfigPathMapper OpenClaw → GameClaw 配置键映射 |
+| **compat** | ConfigPathMapper OpenClaw → GameClaw 配置键映射、OpenClawPluginLoader L3 插件加载器 (JAR/目录/批量)、PluginClassLoader 类隔离 (拦截 ai.gameclaw.internal.*)、PluginManifest plugin.json 解析、PluginFs 文件沙箱 (防 path traversal)、PluginAwareHttpClient 网络沙箱 (白名单过滤)、PluginRegistry Spring Bean 注册 + ApplicationReady 自动加载、PluginLoadedEvent 事件驱动解耦、@OpenClawPlugin 注解 + OpenClawTool 接口 |
 
 ### 供应商模块 (providers)
 
@@ -397,6 +397,7 @@ agent.channels.discord.allowed-user: your-user-id
 | `gameclaw.skills.polling-interval` | 0 | Skills 轮询间隔 (ms, 0=禁用, Docker 环境建议 30000) |
 | `gameclaw.clawhub.enabled` | false | ClawHub 技能市场开关 |
 | `gameclaw.clawhub.registry-url` | https://registry.clawhub.io | ClawHub 注册中心地址 |
+| `gameclaw.plugins.enabled` | false | OpenClaw L3 插件系统开关 |
 | `spring.messages.basename` | i18n/messages | i18n 消息资源路径 |
 | `spring.messages.encoding` | UTF-8 | 消息资源编码 |
 

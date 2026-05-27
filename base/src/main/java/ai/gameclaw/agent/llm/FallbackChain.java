@@ -6,6 +6,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -19,18 +20,18 @@ public class FallbackChain {
     private static final String CIRCUIT_BREAKER_NAME = "llm-default";
 
     private final LlmClient primary;
-    private final List<LlmClient> providers;
+    private final List<LlmClient> fallbacks;
     private final CircuitBreaker circuitBreaker;
     private final ObjectProvider<AiMetrics> aiMetricsProvider;
 
-    public FallbackChain(LlmClient primary,
+    public FallbackChain(@Qualifier("springAiLlmClient") LlmClient primary,
                          ObjectProvider<List<LlmClient>> providersProvider,
                          CircuitBreakerRegistry circuitBreakerRegistry,
                          ObjectProvider<AiMetrics> aiMetricsProvider) {
         this.primary = primary;
         List<LlmClient> all = providersProvider.getIfAvailable(List::of);
-        this.providers = all.stream()
-                .filter(c -> c != primary)
+        this.fallbacks = all.stream()
+                .filter(c -> c != primary && !(c instanceof RoutingLlmClient))
                 .toList();
         this.circuitBreaker = circuitBreakerRegistry.circuitBreaker(CIRCUIT_BREAKER_NAME);
         this.aiMetricsProvider = aiMetricsProvider;
@@ -59,7 +60,7 @@ public class FallbackChain {
     private List<LlmClient> buildChain() {
         List<LlmClient> chain = new ArrayList<>();
         chain.add(primary);
-        chain.addAll(providers);
+        chain.addAll(fallbacks);
         return chain;
     }
 

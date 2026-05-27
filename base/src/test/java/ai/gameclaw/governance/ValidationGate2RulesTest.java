@@ -134,7 +134,14 @@ class ValidationGate2RulesTest {
                 """;
         Files.writeString(rulesDir.resolve("custom-rule.yaml"), yaml);
 
-        CustomRuleLoader loader = new CustomRuleLoader(objectMapper, "file:" + tempDir);
+        CustomRuleLoader loader = new CustomRuleLoader(new org.springframework.beans.factory.ObjectProvider<>() {
+            @Override
+            public com.fasterxml.jackson.databind.ObjectMapper getObject() { return objectMapper; }
+            @Override
+            public com.fasterxml.jackson.databind.ObjectMapper getIfAvailable() { return objectMapper; }
+            @Override
+            public com.fasterxml.jackson.databind.ObjectMapper getIfAvailable(java.util.function.Supplier<com.fasterxml.jackson.databind.ObjectMapper> supplier) { return objectMapper; }
+        }, "file:" + tempDir);
         loader.loadRules();
 
         List<BusinessRule> allRules = new java.util.ArrayList<>(loader.getCustomRules());
@@ -163,7 +170,14 @@ class ValidationGate2RulesTest {
                 """;
         Files.writeString(rulesDir.resolve("custom-rule.yaml"), yaml);
 
-        CustomRuleLoader loader = new CustomRuleLoader(objectMapper, "file:" + tempDir);
+        CustomRuleLoader loader = new CustomRuleLoader(new org.springframework.beans.factory.ObjectProvider<>() {
+            @Override
+            public com.fasterxml.jackson.databind.ObjectMapper getObject() { return objectMapper; }
+            @Override
+            public com.fasterxml.jackson.databind.ObjectMapper getIfAvailable() { return objectMapper; }
+            @Override
+            public com.fasterxml.jackson.databind.ObjectMapper getIfAvailable(java.util.function.Supplier<com.fasterxml.jackson.databind.ObjectMapper> supplier) { return objectMapper; }
+        }, "file:" + tempDir);
         loader.loadRules();
 
         List<BusinessRule> allRules = new java.util.ArrayList<>(loader.getCustomRules());

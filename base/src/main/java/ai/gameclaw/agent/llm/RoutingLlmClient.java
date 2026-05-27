@@ -1,5 +1,6 @@
 package ai.gameclaw.agent.llm;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
@@ -8,18 +9,16 @@ public class RoutingLlmClient implements LlmClient {
 
     private final LlmClient delegate;
     private final ModelRouter modelRouter;
-    private final FallbackChain fallbackChain;
 
-    public RoutingLlmClient(LlmClient delegate, ModelRouter modelRouter, FallbackChain fallbackChain) {
+    public RoutingLlmClient(@Qualifier("springAiLlmClient") LlmClient delegate, ModelRouter modelRouter) {
         this.delegate = delegate;
         this.modelRouter = modelRouter;
-        this.fallbackChain = fallbackChain;
     }
 
     @Override
     public ChatResponse call(ChatRequest request) {
         ModelChoice choice = modelRouter.route(request);
-        return fallbackChain.callWithFallback(request);
+        return delegate.call(request);
     }
 
     @Override

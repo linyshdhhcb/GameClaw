@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -27,9 +28,9 @@ public class CustomRuleLoader {
     private final List<BusinessRule> customRules = new ArrayList<>();
 
     public CustomRuleLoader(
-            ObjectMapper objectMapper,
+            ObjectProvider<ObjectMapper> objectMapperProvider,
             @Value("${gameclaw.workspace:file:./workspace/}") String workspaceStr) {
-        this.objectMapper = objectMapper;
+        this.objectMapper = objectMapperProvider.getIfAvailable(ObjectMapper::new);
         String wsPath = workspaceStr.replace("file:", "").replace("file:///", "/");
         this.rulesDir = Path.of(wsPath).resolve("game-skills").resolve("validation-rules");
     }

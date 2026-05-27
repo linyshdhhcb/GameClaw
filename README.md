@@ -9,7 +9,7 @@
 [![Spring AI](https://img.shields.io/badge/Spring%20AI-2.0.0--M6-6DB33F?logo=spring)](https://spring.io/projects/spring-ai)
 [![License](https://img.shields.io/badge/License-LGPL%20v3-blue)](LICENSE)
 
-**English** | [简体中文](README.zh-CN.md)
+**English** | [简体中文](docs/readme/README.zh-CN.md)
 
 [Features](#features) · [Quick Start](#quick-start) · [Architecture](#architecture) · [Configuration](#configuration) · [Contributing](#contributing)
 

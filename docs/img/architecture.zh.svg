@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" font-family="'Segoe UI', 'SF Pro Text', 'PingFang SC', system-ui, sans-serif">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="layer1" x1="0" y1="0" x2="100" y2="100">
+      <stop offset="0%" stop-color="#ec489a"/>
+      <stop offset="100%" stop-color="#f43f5e"/>
+    </linearGradient>
+    <linearGradient id="layer2" x1="0" y1="0" x2="100" y2="100">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="layer3" x1="0" y1="0" x2="100" y2="100">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+    <linearGradient id="layer4" x1="0" y1="0" x2="100" y2="100">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+    <linearGradient id="layer5" x1="0" y1="0" x2="100" y2="100">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#a78bfa"/>
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="900" height="620" rx="16" fill="url(#bgGrad)"/>
+
+  <!-- 标题 -->
+  <text x="450" y="38" text-anchor="middle" fill="#94a3b8" font-size="13" letter-spacing="4" font-weight="500">GameClaw 架构</text>
+
+  <!-- ========== 第1层：接入渠道 ========== -->
+  <g filter="url(#shadow)">
+    <rect x="30" y="56" width="840" height="78" rx="10" fill="#1e293b" stroke="rgba(236,72,153,0.3)" stroke-width="1"/>
+    <rect x="30" y="56" width="840" height="28" rx="10" fill="url(#layer1)" opacity="0.9"/>
+    <rect x="30" y="74" width="840" height="10" rx="0" fill="url(#layer1)" opacity="0.9"/>
+    <text x="48" y="75" fill="#fff" font-size="12" font-weight="700">接入渠道</text>
+  </g>
+  <!-- 渠道标签 -->
+  <g font-size="13" font-weight="500">
+    <rect x="48" y="98" width="110" height="28" rx="14" fill="#ec489a" opacity="0.15" stroke="#ec489a" stroke-width="0.5"/>
+    <text x="103" y="116" text-anchor="middle" fill="#f9a8d4">🌐 网页聊天</text>
+    <rect x="168" y="98" width="90" height="28" rx="14" fill="#ec489a" opacity="0.15" stroke="#ec489a" stroke-width="0.5"/>
+    <text x="213" y="116" text-anchor="middle" fill="#f9a8d4">📘 飞书</text>
+    <rect x="268" y="98" width="110" height="28" rx="14" fill="#ec489a" opacity="0.15" stroke="#ec489a" stroke-width="0.5"/>
+    <text x="323" y="116" text-anchor="middle" fill="#f9a8d4">📱 电报</text>
+    <rect x="388" y="98" width="100" height="28" rx="14" fill="#ec489a" opacity="0.15" stroke="#ec489a" stroke-width="0.5"/>
+    <text x="438" y="116" text-anchor="middle" fill="#f9a8d4">🎮 Discord</text>
+    <rect x="498" y="98" width="90" height="28" rx="14" fill="#ec489a" opacity="0.15" stroke="#ec489a" stroke-width="0.5"/>
+    <text x="543" y="116" text-anchor="middle" fill="#f9a8d4">⚡ Slack</text>
+    <rect x="598" y="98" width="100" height="28" rx="14" fill="#ec489a" opacity="0.15" stroke="#ec489a" stroke-width="0.5"/>
+    <text x="648" y="116" text-anchor="middle" fill="#f9a8d4">💬 企业微信</text>
+  </g>
+
+  <!-- 连接箭头 1→2 -->
+  <polygon points="450,138 442,148 458,148" fill="#475569"/>
+  <line x1="450" y1="138" x2="450" y2="146" stroke="#475569" stroke-width="2"/>
+
+  <!-- ========== 第2层：智能体核心 ========== -->
+  <g filter="url(#shadow)">
+    <rect x="30" y="152" width="840" height="78" rx="10" fill="#1e293b" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+    <rect x="30" y="152" width="840" height="28" rx="10" fill="url(#layer2)" opacity="0.9"/>
+    <rect x="30" y="170" width="840" height="10" rx="0" fill="url(#layer2)" opacity="0.9"/>
+    <text x="48" y="171" fill="#fff" font-size="12" font-weight="700">智能体核心</text>
+  </g>
+  <g font-size="13" font-weight="500">
+    <rect x="48" y="194" width="170" height="28" rx="6" fill="#3b82f6" opacity="0.12"/>
+    <text x="133" y="213" text-anchor="middle" fill="#93c5fd">🧠 大模型客户端</text>
+    <rect x="228" y="194" width="170" height="28" rx="6" fill="#3b82f6" opacity="0.12"/>
+    <text x="313" y="213" text-anchor="middle" fill="#93c5fd">🎯 模型路由器</text>
+    <rect x="408" y="194" width="180" height="28" rx="6" fill="#3b82f6" opacity="0.12"/>
+    <text x="498" y="213" text-anchor="middle" fill="#93c5fd">🔄 回退链路</text>
+    <rect x="598" y="194" width="170" height="28" rx="6" fill="#3b82f6" opacity="0.12"/>
+    <text x="683" y="213" text-anchor="middle" fill="#93c5fd">💾 对话记忆</text>
+  </g>
+
+  <!-- 连接箭头 2→3 -->
+  <polygon points="450,234 442,244 458,244" fill="#475569"/>
+  <line x1="450" y1="234" x2="450" y2="242" stroke="#475569" stroke-width="2"/>
+
+  <!-- ========== 第3层：工具集 ========== -->
+  <g filter="url(#shadow)">
+    <rect x="30" y="248" width="840" height="78" rx="10" fill="#1e293b" stroke="rgba(16,185,129,0.3)" stroke-width="1"/>
+    <rect x="30" y="248" width="840" height="28" rx="10" fill="url(#layer3)" opacity="0.9"/>
+    <rect x="30" y="266" width="840" height="10" rx="0" fill="url(#layer3)" opacity="0.9"/>
+    <text x="48" y="267" fill="#fff" font-size="12" font-weight="700">工具集</text>
+  </g>
+  <g font-size="13" font-weight="500">
+    <rect x="48" y="290" width="130" height="28" rx="6" fill="#10b981" opacity="0.12"/>
+    <text x="113" y="309" text-anchor="middle" fill="#6ee7b7">🎮 游戏设计</text>
+    <rect x="188" y="290" width="130" height="28" rx="6" fill="#10b981" opacity="0.12"/>
+    <text x="253" y="309" text-anchor="middle" fill="#6ee7b7">⚙️ 游戏代码</text>
+    <rect x="328" y="290" width="130" height="28" rx="6" fill="#10b981" opacity="0.12"/>
+    <text x="393" y="309" text-anchor="middle" fill="#6ee7b7">📊 游戏数据</text>
+    <rect x="468" y="290" width="120" height="28" rx="6" fill="#10b981" opacity="0.12"/>
+    <text x="528" y="309" text-anchor="middle" fill="#6ee7b7">📦 沙箱环境</text>
+    <rect x="598" y="290" width="100" height="28" rx="6" fill="#10b981" opacity="0.12"/>
+    <text x="648" y="309" text-anchor="middle" fill="#6ee7b7">🔌 MCP</text>
+    <rect x="708" y="290" width="90" height="28" rx="6" fill="#10b981" opacity="0.12"/>
+    <text x="753" y="309" text-anchor="middle" fill="#6ee7b7">💻 命令行</text>
+  </g>
+
+  <!-- 连接箭头 3→4 -->
+  <polygon points="450,330 442,340 458,340" fill="#475569"/>
+  <line x1="450" y1="330" x2="450" y2="338" stroke="#475569" stroke-width="2"/>
+
+  <!-- ========== 第4层：治理机制 ========== -->
+  <g filter="url(#shadow)">
+    <rect x="30" y="344" width="840" height="78" rx="10" fill="#1e293b" stroke="rgba(245,158,11,0.3)" stroke-width="1"/>
+    <rect x="30" y="344" width="840" height="28" rx="10" fill="url(#layer4)" opacity="0.9"/>
+    <rect x="30" y="362" width="840" height="10" rx="0" fill="url(#layer4)" opacity="0.9"/>
+    <text x="48" y="363" fill="#fff" font-size="12" font-weight="700">治理机制</text>
+  </g>
+  <g font-size="13" font-weight="500">
+    <rect x="48" y="386" width="185" height="28" rx="6" fill="#f59e0b" opacity="0.12"/>
+    <text x="140" y="405" text-anchor="middle" fill="#fcd34d">📋 闸门1 · 结构约束</text>
+    <rect x="243" y="386" width="185" height="28" rx="6" fill="#f59e0b" opacity="0.12"/>
+    <text x="335" y="405" text-anchor="middle" fill="#fcd34d">⚖️ 闸门2 · 规则校验</text>
+    <rect x="438" y="386" width="185" height="28" rx="6" fill="#f59e0b" opacity="0.12"/>
+    <text x="530" y="405" text-anchor="middle" fill="#fcd34d">📈 闸门3 · 影响评估</text>
+    <rect x="633" y="386" width="185" height="28" rx="6" fill="#f59e0b" opacity="0.12"/>
+    <text x="725" y="405" text-anchor="middle" fill="#fcd34d">👤 闸门4 · 人工审核</text>
+  </g>
+
+  <!-- 连接箭头 4→5 -->
+  <polygon points="450,426 442,436 458,436" fill="#475569"/>
+  <line x1="450" y1="426" x2="450" y2="434" stroke="#475569" stroke-width="2"/>
+
+  <!-- ========== 第5层：基础设施 ========== -->
+  <g filter="url(#shadow)">
+    <rect x="30" y="440" width="840" height="78" rx="10" fill="#1e293b" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+    <rect x="30" y="440" width="840" height="28" rx="10" fill="url(#layer5)" opacity="0.9"/>
+    <rect x="30" y="458" width="840" height="10" rx="0" fill="url(#layer5)" opacity="0.9"/>
+    <text x="48" y="459" fill="#fff" font-size="12" font-weight="700">基础设施</text>
+  </g>
+  <g font-size="13" font-weight="500">
+    <rect x="48" y="482" width="200" height="28" rx="6" fill="#8b5cf6" opacity="0.12"/>
+    <text x="148" y="501" text-anchor="middle" fill="#c4b5fd">🔐 安全（权限/行级/PII）</text>
+    <rect x="258" y="482" width="160" height="28" rx="6" fill="#8b5cf6" opacity="0.12"/>
+    <text x="338" y="501" text-anchor="middle" fill="#c4b5fd">📊 可观测性</text>
+    <rect x="428" y="482" width="140" height="28" rx="6" fill="#8b5cf6" opacity="0.12"/>
+    <text x="498" y="501" text-anchor="middle" fill="#c4b5fd">💰 配额管理</text>
+    <rect x="578" y="482" width="140" height="28" rx="6" fill="#8b5cf6" opacity="0.12"/>
+    <text x="648" y="501" text-anchor="middle" fill="#c4b5fd">🎯 技能库</text>
+  </g>
+
+  <!-- 底部说明 -->
+  <text x="450" y="570" text-anchor="middle" fill="#334155" font-size="10">GameClaw 架构 — 五层治理结构</text>
+
+  <!-- 左侧装饰线 -->
+  <line x1="18" y1="56" x2="18" y2="518" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+</svg>

@@ -38,7 +38,7 @@ GameClaw/
 │   ├── brave/               # Brave Web Search
 │   └── playwright/          # Playwright 浏览器自动化
 ├── mcp-servers/java/        # MCP Server 模块
-├── app/                     # Spring Boot 启动模块
+├── app/                     # Spring Boot 启动模块 + CLI
 └── deploy/docker/           # Docker 部署 (PG16)
 ```
 
@@ -48,13 +48,13 @@ GameClaw/
 
 | 模块 | 功能点 |
 |------|--------|
-| **agent** | Agent 接口 (`respondTo`/`prompt`)、DefaultAgent 实现、LlmClient 统一抽象 (call/stream/embed)、Spring AI / LangChain4j 双适配、对话记忆 (FileSystem + JDBC) |
+| **agent** | Agent 接口 (`respondTo`/`prompt`)、DefaultAgent 实现、LlmClient 统一抽象 (call/stream/embed)、Spring AI / LangChain4j 双适配、对话记忆 (FileSystem + JDBC)、ModelRouter 复杂度路由 (SIMPLE/STANDARD/COMPLEX)、FallbackChain 跨模型降级 (Resilience4j CircuitBreaker)、RoutingLlmClient 路由装饰器 |
 | **channels** | Channel 接口 + ChannelRegistry 注册中心、Conversation/Message 实体、ConversationService 会话管理、JdbcChatMemoryRepository 桥接 Spring AI |
 | **configuration** | ConfigurationManager YAML 读写、DualFormatConfigurationManager 双格式同步 (YAML + JSON)、ConfigurationChangedEvent 变更事件 |
 | **concurrency** | Scopes.race()/all() 封装 StructuredTaskScope、ConcurrencyBanner 启动横幅、PinningWatcher JFR 监控 |
-| **cost** | QuotaManager 配额管理接口 (check/consume/remaining) |
+| **cost** | QuotaManager 配额管理接口、JdbcQuotaManager 三级配额实现 (用户日预算/项目月预算/全局日预算)、QuotaResetJob 定时重置 (JobRunr)、QuotaExhaustedException 配额耗尽异常、V6 迁移 (quotas 表 + RLS) |
 | **files** | YamlParser 轻量 frontmatter 解析器、YamlDocument 文档模型 |
-| **governance** | ValidationGate 闸门接口、ValidationGate1Schema (Jackson + Bean Validation)、ValidatedLlmOutput 多闸门链式验证 + 自动重试、GovernancePolicy 治理策略 |
+| **governance** | ValidationGate 闸门接口、ValidationGate1Schema (Jackson + Bean Validation)、ValidationGate2Rules 轻量规则引擎 (BusinessRule 函数接口 + @ConditionalOnBean)、DefaultBusinessRules 10 条默认规则 (HP/attack/level/dropRate/damage/cooldown/price/rewardGold/expRequired/name)、CustomRuleLoader YAML 自定义规则加载、ValidatedLlmOutput 多闸门链式验证 + 自动重试、GovernancePolicy 治理策略 |
 | **mcp** | McpConnectionsProperties 连接配置、McpHeaderCustomizer 请求头注入 |
 | **observability** | AiMetrics Micrometer 指标集 (7 类)、AiMetricsAspect AOP 自动采集、AuditLogger 审计日志、PinningWatcher 虚拟线程 Pinning 监控 |
 | **onboarding** | OnboardingProvider 引导步骤接口、AgentOnboardingProvider 供应商引导接口、AgentOnboardingProviders 注册中心 |
@@ -62,7 +62,7 @@ GameClaw/
 | **project** | Project 实体、ProjectManager 项目管理接口 |
 | **providers** | AgentProvider 供应商聚合器、getDefaultChatModel 默认模型获取 |
 | **security** | TenantContext + TenantContextHolder (ScopedValue)、RBAC 5 级风险 × 10 种角色、@RequireRole/@RequireRiskLevel 注解 + AOP、DefaultRbacService (DB + Caffeine 双缓存 + fallback 矩阵)、PromptSanitizer 7 种注入检测、OutboundUrlFilter 出站白名单、PiiMasking PII 脱敏、PiiFieldRegistry 字段分类 (5 类)、PiiMaskingPostProcessor 角色化解密 (ADMIN/DATA_ANALYST 全可见)、SingleTenantFallback 单租户回退 |
-| **skills** | GameClawSkillParser SKILL.md 解析、GameClawSkillsLoader 四级优先级加载 (classpath → ~/.openclaw → ~/.gameclaw → workspace)、Caffeine LRU 缓存 |
+| **skills** | GameClawSkillParser SKILL.md 解析、GameClawSkillsLoader 四级优先级加载 (classpath → ~/.openclaw → ~/.gameclaw → workspace)、Caffeine LRU 缓存、SkillsWatcher 热重载 (WatchService + 250ms 防抖 + 虚拟线程 + 可选轮询模式)、ClawHubClient 技能市场 (install/search/update + @ConditionalOnProperty)、SkillsChangedEvent/SkillInstalledEvent Spring 事件 |
 | **tasks** | Task/RecurringTask 实体、TaskManager (JobRunr 调度)、TaskHandler Agent 执行、FileSystemTaskRepository YAML 文件存储 |
 | **tools** | TaskTool 任务工具、CheckListTool 清单工具、McpTool MCP 服务器管理、@GameTool 工具注册注解、AgentEnvironment 运行环境信息、Lucene 动态工具发现 |
 | **tools/game** | GameDesignTool 策划配置生成 (怪物/技能/道具/任务/成长曲线)、GameCodeTool 代码生成 (Unity/Unreal/Godot)、ApiHallucinationDetector API 幻觉检测 + 引擎 API 查询、Engine 枚举 (UNITY/UNREAL/GODOT) |
@@ -121,7 +121,21 @@ GameClaw/
 
 | 模块 | 功能点 |
 |------|--------|
-| **clickhouse-mcp-server** | ClickHouseTools (list_tables/describe_table/execute_query)、SqlSafetyValidator JSqlParser SELECT-only 校验、只读账号 mcp_data_warehouse、ClickHouseProperties 连接配置 |
+| **clickhouse-mcp-server** | ClickHouseTools (list_tables/describe_table/execute_query)、SqlSafetyValidator JSqlParser SELECT-only 校验、只读账号 mcp_data_warehouse、BearerTokenFilter Bearer Token 鉴权、ClickHouseProperties 连接配置 |
+
+### CLI 命令 (app/cli)
+
+基于 Picocli 的命令行工具，`gameclaw` 主命令 + 子命令：
+
+| 命令 | 说明 |
+|------|------|
+| `gameclaw skill install <name>` | 从 ClawHub 安装技能包 |
+| `gameclaw skill install <name>@<version>` | 安装指定版本 |
+| `gameclaw skill search <query>` | 搜索 ClawHub 技能市场 |
+| `gameclaw skill update --all` | 更新所有已安装技能 |
+| `gameclaw skill list --installed` | 列出已安装技能 |
+| `gameclaw quota check <tenantId>` | 检查配额是否可用 |
+| `gameclaw quota remaining <tenantId>` | 查看剩余配额 |
 
 ### 引擎 API 索引 (workspace/game-skills)
 
@@ -130,6 +144,14 @@ GameClaw/
 | Unity | 269 | UnityEngine / UnityEditor 核心 API |
 | Unreal | 151 | U/A/F 前缀 + GEngine/GetWorld |
 | Godot | 196 | GDScript 核心 + Server API |
+
+### 数据分析 Skills (workspace/game-skills/data-analysis)
+
+| 模板 | 说明 |
+|------|------|
+| DAU 查询 | 近7天/30天 DAU 趋势、环比同比、分渠道/分地区 DAU |
+| 留存查询 | 次日/7日/30日留存、分渠道留存、留存趋势 |
+| 付费查询 | 付费总额、ARPU/ARPPU、付费率、分档位分布、LTV |
 
 ## 启动后能做什么
 
@@ -145,6 +167,9 @@ GameClaw/
 | Prometheus 指标 | http://localhost:8090/actuator/prometheus — 7 类 AI 指标 |
 | API 幻觉检测 | 引擎 API 索引已加载（Unity 269 / Unreal 151 / Godot 196），可查询引擎 API |
 | 多语言切换 | UI 支持中文/英文切换，URL `?lang=zh` 或 `?lang=en`，Cookie 持久化 |
+| Skills 热重载 | 修改 SKILL.md 文件 250ms 内自动重载，无需重启 |
+| 闸门 2 规则引擎 | 10 条默认业务规则（HP/攻击/等级/掉落率等范围校验），支持 YAML 自定义规则 |
+| 三级配额 | 用户日预算 (1元) / 项目月预算 (1000元) / 全局日预算 (10000元)，超限阻断 |
 
 ### 配置 LLM 后可用
 
@@ -363,6 +388,15 @@ agent.channels.discord.allowed-user: your-user-id
 | `gameclaw.audit.enabled` | true | 审计日志开关 |
 | `spring.threads.virtual.enabled` | true | 虚拟线程开关 |
 | `spring.flyway.enabled` | false | Flyway 迁移开关 |
+| `gameclaw.quota.enabled` | true | 配额管理开关 |
+| `gameclaw.quota.user-daily-limit` | 1.0 | 用户日预算 (CNY) |
+| `gameclaw.quota.project-monthly-limit` | 1000.0 | 项目月预算 (CNY) |
+| `gameclaw.quota.global-daily-limit` | 10000.0 | 全局日预算 (CNY) |
+| `gameclaw.llm.model-map.*` | haiku/sonnet/opus | 复杂度→模型映射 |
+| `gameclaw.llm.fallback-map.*` | sonnet/haiku/sonnet | 复杂度→降级模型映射 |
+| `gameclaw.skills.polling-interval` | 0 | Skills 轮询间隔 (ms, 0=禁用, Docker 环境建议 30000) |
+| `gameclaw.clawhub.enabled` | false | ClawHub 技能市场开关 |
+| `gameclaw.clawhub.registry-url` | https://registry.clawhub.io | ClawHub 注册中心地址 |
 | `spring.messages.basename` | i18n/messages | i18n 消息资源路径 |
 | `spring.messages.encoding` | UTF-8 | 消息资源编码 |
 

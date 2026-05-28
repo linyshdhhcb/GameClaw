@@ -1,0 +1,40 @@
+<div id="onboarding-step" class="step-fragment">
+    <p class="is-uppercase has-text-weight-semibold has-text-grey is-size-7 mb-3">Step {{ currentStepNumber }} of {{ totalSteps }}</p>
+    <h2 class="title is-3 mb-3">Connect Slack Bot.</h2>
+    <p class="subtitle is-5 has-text-grey-dark">Create a Slack App with Socket Mode enabled, then enter the credentials below. Enable the <code>connections:write</code> scope and subscribe to <code>message.channels</code>, <code>message.groups</code> events.</p>
+
+    {% if error %}
+    <article class="message is-danger">
+        <div class="message-body">{{ error }}</div>
+    </article>
+    {% endif %}
+
+    <form method="post" action="/onboarding/slack">
+        <div class="field">
+            <label class="label">Bot Token</label>
+            <div class="control">
+                <input class="input" type="password" name="slackBotToken" value="{{ slackBotToken }}" placeholder="xoxb-..." required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">App Token</label>
+            <div class="control">
+                <input class="input" type="password" name="slackAppToken" value="{{ slackAppToken }}" placeholder="xapp-..." required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Allowed User <span class="has-text-grey">(optional)</span></label>
+            <div class="control">
+                <input class="input" type="text" name="slackAllowedUser" value="{{ slackAllowedUser }}" placeholder="Slack user ID">
+            </div>
+        </div>
+
+        <div class="buttons mt-4">
+            <a class="button is-light is-medium" href="{{ previousStepUrl }}">Back</a>
+            <button class="button is-primary is-medium" type="submit">Continue</button>
+            <a class="button is-ghost is-medium" href="{{ nextStepUrl }}">Skip</a>
+        </div>
+    </form>
+</div>

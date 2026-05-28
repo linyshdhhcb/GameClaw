@@ -46,6 +46,21 @@ gameclaw:
         - open.feishu.cn
         - registry.clawhub.io
         - localhost
+  governance:
+    impact:
+      high-impact-file-count: 10
+      medium-impact-file-count: 5
+      max-scan-files: 1000
+    approval:
+      enabled: true
+      default-ttl-minutes: 60
+    rollback:
+      enabled: true
+      auto:
+        enabled: false
+        check-interval-ms: 30000
+        error-rate-threshold: 0.05
+        deploy-window-seconds: 600
 
 spring:
   application:

@@ -311,15 +311,42 @@
         DATA_ANALYST: ['Read', 'Sandbox Write'],
         PLANNER: ['Read', 'Sandbox Write'],
         OPERATIONS: ['Read', 'Sandbox Write'],
-        TA: ['Read']
+        TA: ['Read', 'Sandbox Write', 'Project Write']
+    };
+
+    var toolDisplayNames = {
+        game_design_tool: 'Design',
+        game_code_tool: 'Code',
+        game_data_tool: 'Data',
+        game_balance_tool: 'Balance',
+        game_test_tool: 'Test',
+        game_ops_tool: 'Ops',
+        game_asset_tool: 'Asset',
+        game_project_tool: 'Project',
+        deploy_tool: 'Deploy'
     };
 
     function updateToolList(role) {
         if (!toolList) return;
-        var tools = roleTools[role] || ['Read'];
-        toolList.innerHTML = tools.map(function(t) {
-            return '<span class="tag">' + t + '</span>';
-        }).join('');
+        fetch('/api/roles/' + role + '/tools').then(function(r) { return r.json(); }).then(function(data) {
+            if (data.tools && data.tools.length > 0 && data.tools[0].tool !== 'default') {
+                toolList.innerHTML = data.tools.map(function(t) {
+                    var name = toolDisplayNames[t.tool] || t.tool;
+                    var suffix = t.requires_approval ? ' *' : '';
+                    return '<span class="tag" title="' + t.tool + ': ' + t.max_risk + '">' + name + suffix + '</span>';
+                }).join('');
+            } else {
+                var tools = roleTools[role] || ['Read'];
+                toolList.innerHTML = tools.map(function(t) {
+                    return '<span class="tag">' + t + '</span>';
+                }).join('');
+            }
+        }).catch(function() {
+            var tools = roleTools[role] || ['Read'];
+            toolList.innerHTML = tools.map(function(t) {
+                return '<span class="tag">' + t + '</span>';
+            }).join('');
+        });
     }
 
     function loadRoles() {
@@ -341,7 +368,9 @@
 
     if (roleSelector) {
         roleSelector.addEventListener('change', function() {
-            updateToolList(roleSelector.value);
+            var role = roleSelector.value;
+            updateToolList(role);
+            fetch('/api/roles/switch?role=' + encodeURIComponent(role), { method: 'PUT' }).catch(function() {});
         });
     }
 

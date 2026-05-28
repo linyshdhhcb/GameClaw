@@ -1,0 +1,54 @@
+<div id="onboarding-step" class="step-fragment">
+    <p class="is-uppercase has-text-weight-semibold has-text-grey is-size-7 mb-3">Step {{ currentStepNumber }} of {{ totalSteps }}</p>
+    <h2 class="title is-3 mb-3">Connect WeCom Bot.</h2>
+    <p class="subtitle is-5 has-text-grey-dark">Register a WeCom custom app, then enter the credentials below. Callback URL: <code>/api/wecom/event</code></p>
+
+    {% if error %}
+    <article class="message is-danger">
+        <div class="message-body">{{ error }}</div>
+    </article>
+    {% endif %}
+
+    <form method="post" action="/onboarding/wecom">
+        <div class="field">
+            <label class="label">Corp ID</label>
+            <div class="control">
+                <input class="input" type="text" name="wecomCorpId" value="{{ wecomCorpId }}" placeholder="ww1234567890abcdef" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Agent ID</label>
+            <div class="control">
+                <input class="input" type="text" name="wecomAgentId" value="{{ wecomAgentId }}" placeholder="1000002" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Secret</label>
+            <div class="control">
+                <input class="input" type="password" name="wecomSecret" value="{{ wecomSecret }}" placeholder="Your app secret" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Token</label>
+            <div class="control">
+                <input class="input" type="text" name="wecomToken" value="{{ wecomToken }}" placeholder="Callback verification token" required>
+            </div>
+        </div>
+
+        <div class="field">
+            <label class="label">Encoding AES Key</label>
+            <div class="control">
+                <input class="input" type="text" name="wecomEncodingAesKey" value="{{ wecomEncodingAesKey }}" placeholder="43-character Base64-encoded AES key" required>
+            </div>
+        </div>
+
+        <div class="buttons mt-4">
+            <a class="button is-light is-medium" href="{{ previousStepUrl }}">Back</a>
+            <button class="button is-primary is-medium" type="submit">Continue</button>
+            <a class="button is-ghost is-medium" href="{{ nextStepUrl }}">Skip</a>
+        </div>
+    </form>
+</div>

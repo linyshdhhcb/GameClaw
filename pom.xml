@@ -32,6 +32,8 @@
         <module>plugins/playwright</module>
         <module>plugins/telegram</module>
         <module>plugins/feishu</module>
+        <module>plugins/slack</module>
+        <module>plugins/wecom</module>
         <module>mcp-servers/java</module>
         <module>app</module>
     </modules>
@@ -57,6 +59,7 @@
         <spotbugs-maven-plugin.version>4.9.3.0</spotbugs-maven-plugin.version>
         <spotbugs.version>4.9.3</spotbugs.version>
         <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
+        <slack-sdk.version>1.49.0</slack-sdk.version>
     </properties>
 
     <dependencyManagement>
@@ -147,6 +150,16 @@
             <dependency>
                 <groupId>ai.gameclaw</groupId>
                 <artifactId>gameclaw-plugin-telegram</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.gameclaw</groupId>
+                <artifactId>gameclaw-plugin-slack</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.gameclaw</groupId>
+                <artifactId>gameclaw-plugin-wecom</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

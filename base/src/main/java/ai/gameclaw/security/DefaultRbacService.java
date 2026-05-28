@@ -156,7 +156,7 @@ public class DefaultRbacService implements RbacService {
         matrix.put(Role.DEVOPS, Set.of(RiskLevel.L1_READ, RiskLevel.L2_SANDBOX_WRITE, RiskLevel.L3_PROJECT_WRITE, RiskLevel.L4_DB_WRITE));
         matrix.put(Role.PLANNER, Set.of(RiskLevel.L1_READ, RiskLevel.L2_SANDBOX_WRITE));
         matrix.put(Role.OPERATIONS, Set.of(RiskLevel.L1_READ, RiskLevel.L2_SANDBOX_WRITE));
-        matrix.put(Role.TA, Set.of(RiskLevel.L1_READ));
+        matrix.put(Role.TA, Set.of(RiskLevel.L1_READ, RiskLevel.L2_SANDBOX_WRITE, RiskLevel.L3_PROJECT_WRITE));
         matrix.put(Role.PROJECT_MANAGER, Set.of(RiskLevel.L1_READ, RiskLevel.L2_SANDBOX_WRITE, RiskLevel.L3_PROJECT_WRITE));
         return matrix;
     }
